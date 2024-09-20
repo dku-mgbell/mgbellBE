@@ -1,22 +1,33 @@
 package com.mgbell.user.service;
 
+import com.mgbell.global.auth.jwt.JwtProvider;
+import com.mgbell.global.auth.jwt.JwtToken;
+import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.LoginRequest;
 import com.mgbell.user.model.dto.request.SignupRequest;
+import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.user.model.entity.User;
 import com.mgbell.user.model.entity.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public void signUp(SignupRequest request) {
+        if(userRepository.findByUserId(request.getUserId()).isPresent()) {
+            throw new RuntimeException("User already exists");
+        }
+
         User user = User.builder()
                 .userId(request.getUserId())
-                .password(request.getPassword()) // Todo 비밀번호 암호화 기능
+                .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
@@ -26,12 +37,15 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequest request) {
-        if(userRepository.findByUserId(request.getId()).isPresent()){
-            /*
-            Todo
-             JWT 토큰 발급 로직 만들기
-             */
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            JwtToken token = jwtProvider.issue(user);
+            return new LoginResponse(token.getAccessToken(), token.getRefreshToken());
+        } else {
+            throw new RuntimeException("Wrong password");
         }
     }
 }
