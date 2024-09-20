@@ -1,9 +1,8 @@
 package com.mgbell.global.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mgbell.user.model.dto.request.LoginRequest;
-import com.mgbell.user.model.entity.User;
-import com.mgbell.user.model.entity.UserRole;
+import com.mgbell.user.model.entity.user.User;
+import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;

@@ -6,8 +6,8 @@ import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.LoginRequest;
 import com.mgbell.user.model.dto.request.SignupRequest;
 import com.mgbell.user.model.dto.response.LoginResponse;
-import com.mgbell.user.model.entity.User;
-import com.mgbell.user.model.entity.UserRole;
+import com.mgbell.user.model.entity.user.User;
+import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +22,7 @@ public class UserService {
 
     public void signUp(SignupRequest request) {
         if(userRepository.findByUserId(request.getUserId()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new RuntimeException("USER ALREADY EXISTS");
         }
 
         User user = User.builder()

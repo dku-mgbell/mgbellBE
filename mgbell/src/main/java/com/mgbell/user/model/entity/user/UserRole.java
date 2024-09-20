@@ -1,4 +1,4 @@
-package com.mgbell.user.model.entity;
+package com.mgbell.user.model.entity.user;
 
 import java.util.Map;
 import java.util.stream.Collectors;
