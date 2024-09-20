@@ -1,6 +1,6 @@
 package com.mgbell.global.auth.jwt;
 
-import com.mgbell.user.model.entity.UserRole;
+import com.mgbell.user.model.entity.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
