@@ -1,8 +1,6 @@
 package com.mgbell.global.auth.jwt;
 
-import com.mgbell.user.model.entity.UserRole;
-
-import java.util.Optional;
+import com.mgbell.user.model.entity.user.UserRole;
 
 public interface AuthenticationProvider {
     String createAccessToken(String userId, UserRole userRole);
