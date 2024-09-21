@@ -3,6 +3,9 @@ package com.mgbell.user.model.entity.user;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -12,6 +15,7 @@ public enum UserRole {
     OWNER("ROLE_OWNER"),
     ADMIN(combine("ROLE_ADMIN", "ROLE_USER", "ROLE_OWNER"));
 
+    @JsonValue
     private final String name;
 
     UserRole(String name) {
@@ -31,5 +35,15 @@ public enum UserRole {
 
     public boolean isAdmin() {
         return this == ADMIN;
+    }
+
+    @JsonCreator
+    public static UserRole from(String val) {
+        for (UserRole role : UserRole.values()) {
+            if (role.name().equals(val)) {
+                return role;
+            }
+        }
+        return null;
     }
 }

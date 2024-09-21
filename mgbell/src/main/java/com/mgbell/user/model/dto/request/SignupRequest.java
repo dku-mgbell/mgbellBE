@@ -1,6 +1,9 @@
 package com.mgbell.user.model.dto.request;
 
+import com.mgbell.user.model.entity.user.UserRole;
+import com.mgbell.user.model.entity.user.validator.Enum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequest {
+    @Enum(enumClass = UserRole.class, message = "전공을 선택해주세요")
+    private UserRole userRole;
+
     @NotBlank(message = "아이디는 필수 입력값입니다")
     @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]{5,12}$",
     message = "아이디의 첫 글자는 영어 대/소문자로 시작해야 하며, 영문, 숫자, '_'으로만 이루어진 5 ~ 12자 이하여야 합니다.")
