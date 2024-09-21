@@ -71,6 +71,8 @@ public class SecurityConfig {
                     authorizeRequests.requestMatchers("/v3/api-docs/**",
                             "/webjars/**").permitAll();
                     authorizeRequests.requestMatchers("/user/**").permitAll();
+                    authorizeRequests.requestMatchers("/store/**").permitAll();
+                    authorizeRequests.requestMatchers("/post/**").permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();

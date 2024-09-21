@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoreRegisterRequest {
+    private Long userId;
     private String name;
     private String address;
     private StoreType storeType;
