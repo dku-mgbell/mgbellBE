@@ -31,7 +31,7 @@ public class UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
-                .userRole(UserRole.USER)
+                .userRole(request.getUserRole())
                 .build();
 
         userRepository.save(user);
