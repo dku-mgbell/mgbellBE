@@ -1,11 +1,14 @@
 package com.mgbell.user.service;
 
 import com.mgbell.user.exception.StoreNotFoundException;
+import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.StoreRegisterRequest;
 import com.mgbell.user.model.dto.response.StoreResponse;
 import com.mgbell.user.model.entity.store.Status;
 import com.mgbell.user.model.entity.store.Store;
+import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.StoreRepository;
+import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,14 +21,21 @@ import java.util.List;
 @AllArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
+    @Transactional
     public void register(StoreRegisterRequest request) {
-        Store store = Store.builder()
-                .name(request.getName())
-                .address(request.getAddress())
-                .storeType(request.getStoreType())
-                .status(Status.INACTIVE)
-                .build();
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+
+        Store store = new Store(
+                request.getName(),
+                request.getAddress(),
+                request.getStoreType(),
+                Status.INACTIVE,
+                user);
+
+//        user.setStore(store);
 
         storeRepository.save(store);
     }
@@ -45,12 +55,12 @@ public class StoreService {
     }
 
     public Page<StoreResponse> getApprovedStore(Pageable pageable) {
-        Page<Store> stores = storeRepository.findByStatus(String.valueOf(Status.ACTIVE), pageable);
+        Page<Store> stores = storeRepository.findByStatus(Status.ACTIVE, pageable);
         return getStoreResponse(stores);
     }
 
     public Page<StoreResponse> getNotApprovedStore(Pageable pageable) {
-        Page<Store> stores = storeRepository.findByStatus(String.valueOf(Status.INACTIVE), pageable);
+        Page<Store> stores = storeRepository.findByStatus(Status.INACTIVE, pageable);
 
         return getStoreResponse(stores);
     }

@@ -1,5 +1,6 @@
 package com.mgbell.user.model.entity.user;
 
+import com.mgbell.user.model.entity.store.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,14 @@ public class User {
     @NotNull
     private String phoneNumber;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @OneToOne(mappedBy = "user")
+//    @JoinColumn(name = "store_id")
+    private Store store;
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
 }
