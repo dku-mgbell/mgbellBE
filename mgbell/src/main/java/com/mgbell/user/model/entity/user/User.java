@@ -3,10 +3,7 @@ package com.mgbell.user.model.entity.user;
 import com.mgbell.user.model.entity.store.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
@@ -19,11 +16,9 @@ public class User {
     @GeneratedValue
     private Long id;
     @NotNull
-    private String userId;
+    private String email;
     @NotNull
     private String password;
-    @NotNull
-    private String email;
     @NotNull
     private String name;
     @NotNull
@@ -32,11 +27,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Setter
     @OneToOne(mappedBy = "user")
-//    @JoinColumn(name = "store_id")
     private Store store;
-
-    public void setStore(Store store) {
-        this.store = store;
-    }
 }

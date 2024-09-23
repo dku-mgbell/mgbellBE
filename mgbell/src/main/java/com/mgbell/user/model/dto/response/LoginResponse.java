@@ -1,5 +1,6 @@
 package com.mgbell.user.model.dto.response;
 
+import com.mgbell.user.model.entity.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,4 +9,5 @@ import lombok.Getter;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
+    private UserRole role;
 }

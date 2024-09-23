@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PickupTimeCreateRequest {
     @NotNull(message = "week error")
-    private Week weekOfWeek;
+    private Week dayOfWeek;
     @NotNull(message = "startAt error")
     private LocalDateTime startAt;
     @NotNull(message = "endAt error")
