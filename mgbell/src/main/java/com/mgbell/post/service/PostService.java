@@ -83,7 +83,7 @@ public class PostService {
 
         for (PickupTimeCreateRequest time : times) {
             PickupTime pickupTime = PickupTime.builder()
-                    .weekOfWeek(time.getWeekOfWeek())
+                    .weekOfWeek(time.getDayOfWeek())
                     .startAt(time.getStartAt())
                     .endAt(time.getEndAt())
                     .build();
