@@ -38,14 +38,14 @@ public class UserService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByUserId(request.getUserId())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             JwtToken token = jwtProvider.issue(user);
-            return new LoginResponse(token.getAccessToken(), token.getRefreshToken());
+            return new LoginResponse(token.getAccessToken(), token.getRefreshToken(), user.getUserRole());
         } else {
-            throw new RuntimeException("Wrong password");
+            throw new IncorrectPassword();
         }
     }
 
