@@ -1,4 +1,4 @@
-package com.mgbell.global.config;
+package com.mgbell.global.config.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
         name = "JWT Token",
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
-        scheme = "bearer"
+        scheme = "Bearer"
 )
 @RequiredArgsConstructor
 @Configuration
@@ -25,6 +25,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI getOpenApi() {
 
-        return new OpenAPI().components(new Components());
+        return new OpenAPI()
+                .components(new Components());
     }
 }
