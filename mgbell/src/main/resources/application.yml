@@ -40,3 +40,6 @@ nhn:
   url: ${nhn.url}
   secretKey: ${nhn.secretKey}
 
+oauth:
+  uri: ${oauth.uri}
+
