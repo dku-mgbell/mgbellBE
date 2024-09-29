@@ -1,7 +1,9 @@
 package com.mgbell.user.service;
 
+import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.auth.jwt.JwtProvider;
 import com.mgbell.global.auth.jwt.JwtToken;
+import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.user.exception.IncorrectPassword;
 import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.exception.UserNotFoundException;
@@ -51,5 +53,11 @@ public class UserService {
 
     public Boolean isDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    public String oAuthLogin(JwtAuthentication auth) {
+        User user = userRepository.findById(auth.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        return user.getEmail();
     }
 }
