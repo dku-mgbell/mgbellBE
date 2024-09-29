@@ -8,12 +8,15 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtProvider implements AuthenticationProvider {
     @Value("${jwt.secret}")
@@ -30,7 +33,8 @@ public class JwtProvider implements AuthenticationProvider {
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String USERNAME_CLAIM = "email";
-    private static final String BEARER = "Bearer ";
+    private static final String BEARER = "bearer ";
+    public static final String AUTHORIZATION = "Authorization";
 
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
@@ -46,6 +50,7 @@ public class JwtProvider implements AuthenticationProvider {
         Jws<Claims> claimsJws = validateAccessToken(accessToken);
 
         Claims body = claimsJws.getBody();
+        log.info(body.get("userId").toString());
         Long userId = Long.parseLong((String) body.get("userId"));
         UserRole userRole = UserRole.of((String) body.get("userRole"));
 
@@ -113,9 +118,9 @@ public class JwtProvider implements AuthenticationProvider {
             }
         }
 
-        String header = request.getHeader(ACCESS_TOKEN_SUBJECT);
+        String header = request.getHeader(AUTHORIZATION);
         if (header != null) {
-            if (!header.toLowerCase().startsWith("bearer ")) {
+            if (!header.toLowerCase().startsWith(BEARER)) {
                 throw new RuntimeException();
             }
             return header.substring(7);

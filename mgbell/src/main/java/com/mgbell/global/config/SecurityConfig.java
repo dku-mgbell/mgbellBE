@@ -3,9 +3,13 @@ package com.mgbell.global.config;
 import com.mgbell.global.auth.jwt.JwtAuthEntryPoint;
 import com.mgbell.global.auth.jwt.JwtAuthenticationFilter;
 import com.mgbell.global.auth.jwt.JwtProvider;
+import com.mgbell.global.auth.oauth2.CustomOAuth2UserService;
+import com.mgbell.global.auth.oauth2.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,11 +33,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
-    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtProvider);
+    }
+
+    @Bean
+    public JwtAuthEntryPoint jwtAuthEntryPoint() {
+        return new JwtAuthEntryPoint();
     }
 
     @Bean
@@ -56,6 +66,12 @@ public class SecurityConfig {
     }
 
     @Bean
+    AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            HandlerMappingIntrospector introspector) throws Exception {
         return http
@@ -69,13 +85,17 @@ public class SecurityConfig {
                     authorizeRequests.requestMatchers(
                             new MvcRequestMatcher(introspector, "/swagger-ui/**")).permitAll();
                     authorizeRequests.requestMatchers("/v3/api-docs/**",
-                            "/webjars/**").permitAll();
+                            "/webjars/**", "/error", "/favicon.ico").permitAll();
                     authorizeRequests.requestMatchers("/user/**").permitAll();
                     authorizeRequests.requestMatchers("/store/**").permitAll();
                     authorizeRequests.requestMatchers("/post/**").permitAll();
                     authorizeRequests.requestMatchers("/email/**").permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth ->
+                        oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                )
                 .build();
     }
 }

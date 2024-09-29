@@ -2,6 +2,7 @@ package com.mgbell.global.auth.jwt;
 
 import com.mgbell.user.model.entity.user.UserRole;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -10,6 +11,7 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class JwtAuthentication implements Authentication {
+    @Getter
     private Long userId;
     private UserRole userRole;
 
@@ -51,4 +53,5 @@ public class JwtAuthentication implements Authentication {
     public String getName() {
         return null;
     }
+
 }

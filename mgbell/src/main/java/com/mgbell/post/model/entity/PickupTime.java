@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class PickupTime {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     @Enumerated(EnumType.STRING)

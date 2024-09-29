@@ -1,5 +1,6 @@
 package com.mgbell.post.controller;
 
+import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.service.PostService;
@@ -26,6 +27,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @OwnerAuth
     @PostMapping
     @Operation(summary = "게시글 생성")
     public void create(@RequestBody @Validated PostCreateRequest request) {

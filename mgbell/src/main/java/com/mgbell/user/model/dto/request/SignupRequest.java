@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequest {
-    @Enum(enumClass = UserRole.class, message = "전공을 선택해주세요")
+    @Enum(enumClass = UserRole.class, message = "가입 유형은 필수 입력값입니다.(USER, OWNER)")
     private UserRole userRole;
 
 //    @NotBlank(message = "아이디는 필수 입력값입니다")
@@ -32,8 +32,8 @@ public class SignupRequest {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=\\S+$).{8,16}",
-            message = "비밀번호는 영문 대/소문자, 숫자, 특수문자를 포함하여 8~16자여야 합니다.")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-z])(?=\\S+$).{8,16}",
+            message = "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다.")
     private String password;
 
     @NotBlank(message = "이름은 필수 입력값입니다")
