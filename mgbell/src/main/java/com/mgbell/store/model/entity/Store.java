@@ -29,7 +29,7 @@ public class Store {
     private Status status;
 
     @NotNull
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

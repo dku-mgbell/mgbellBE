@@ -37,6 +37,13 @@ public class StoreController {
         return ResponseEntity.ok(storeService.getStoreInfo(auth.getUserId()));
     }
 
+    @OwnerAuth
+    @DeleteMapping
+    public void delete(JwtAuthentication auth) {
+        storeService.delete(auth.getUserId());
+    }
+
+
 
     @AdminAuth
     @PatchMapping(path = "/approve/{storeId}")

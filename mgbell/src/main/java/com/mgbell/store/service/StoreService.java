@@ -69,6 +69,14 @@ public class StoreService {
         store.setStatus(Status.INACTIVE);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Store store = storeRepository.findByUserId(id)
+                        .orElseThrow(StoreNotFoundException::new);
+        store.setPost(null);
+        storeRepository.deleteById(id);
+    }
+
     public Page<StoreResponse> getAllStores(Pageable pageable) {
         Page<Store> stores = storeRepository.findAll(pageable);
 
@@ -109,6 +117,7 @@ public class StoreService {
                         store.getStatus()
                 ));
     }
+
 
 //    private void saveFiles(MultipartFile files, Store store) {
 //        List<RequestFile> requestFiles = fileUploadService.uploadFiles(
