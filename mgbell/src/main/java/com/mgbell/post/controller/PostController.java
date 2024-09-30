@@ -1,5 +1,6 @@
 package com.mgbell.post.controller;
 
+import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
@@ -30,8 +31,8 @@ public class PostController {
     @OwnerAuth
     @PostMapping
     @Operation(summary = "게시글 생성")
-    public void create(@RequestBody @Validated PostCreateRequest request) {
-        postService.create(request);
+    public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
+        postService.create(request, auth.getUserId());
     }
 
 }

@@ -12,8 +12,7 @@ import java.util.ArrayList;
 @Getter
 @AllArgsConstructor
 public class PostCreateRequest {
-    @NotNull(message = "userId error")
-    private Long userId;
+
     @NotBlank(message = "title error")
     private String title;
     @NotBlank(message = "content error")
