@@ -2,8 +2,10 @@ package com.mgbell.user.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.UserAuth;
+import com.mgbell.user.model.dto.request.EmailRequest;
 import com.mgbell.user.model.dto.request.LoginRequest;
 import com.mgbell.user.model.dto.request.SignupRequest;
+import com.mgbell.user.model.dto.response.IdDupValidResponse;
 import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +29,12 @@ public class UserController {
         userService.signUp(request);
     }
 
-    @UserAuth
-    @GetMapping(path = "/oauth2/login")
-    public String oAuthLogin(JwtAuthentication auth) {
-        return userService.oAuthLogin(auth);
+    @PostMapping(path = "/dupCheck")
+    public ResponseEntity<IdDupValidResponse> dupCheck(@RequestBody @Validated EmailRequest request) {
+        boolean valid = userService.isDuplicateEmail(request.getEmail());
+        IdDupValidResponse response = IdDupValidResponse.builder()
+                .valid(valid)
+                .build();
+        return ResponseEntity.ok(response);
     }
 }

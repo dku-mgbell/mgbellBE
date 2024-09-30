@@ -36,7 +36,7 @@ public class OAuth2UserInfo {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuth2UserInfo.builder()
-                .name(String.valueOf(response.get("nickname")))
+                .name(String.valueOf(response.get("name")))
                 .email(String.valueOf(response.get("email")))
                 .build();
     }

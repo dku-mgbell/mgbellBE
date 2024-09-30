@@ -1,17 +1,17 @@
 package com.mgbell.user.service;
 
-import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.auth.jwt.JwtProvider;
 import com.mgbell.global.auth.jwt.JwtToken;
-import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.user.exception.IncorrectPassword;
 import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.LoginRequest;
+import com.mgbell.user.model.dto.request.OAuthSignupRequest;
 import com.mgbell.user.model.dto.request.SignupRequest;
 import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,12 +51,22 @@ public class UserService {
         }
     }
 
-    public Boolean isDuplicateEmail(String email) {
+    public boolean isDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public String oAuthLogin(JwtAuthentication auth) {
-        User user = userRepository.findById(auth.getUserId())
+    @Transactional
+    public void oAuthSignup(OAuthSignupRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setUserRole(request.getUserRole());
+        user.setName(request.getName());
+        user.setPhoneNumber(request.getPhoneNumber());
+    }
+
+    public String oAuthLogin(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
         return user.getEmail();
     }
