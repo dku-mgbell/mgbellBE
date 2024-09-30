@@ -2,9 +2,7 @@ package com.mgbell.user.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.AllUserAuth;
-import com.mgbell.user.model.dto.request.EmailRequest;
-import com.mgbell.user.model.dto.request.LoginRequest;
-import com.mgbell.user.model.dto.request.SignupRequest;
+import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.IdDupValidResponse;
 import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.user.service.UserService;
@@ -26,9 +24,21 @@ public class UserController {
     }
 
     @AllUserAuth
+    @PatchMapping(path = "/edit")
+    public void edit(@RequestBody UserEditRequest request, JwtAuthentication auth) {
+        userService.edit(request, auth.getUserId());
+    }
+
+    @AllUserAuth
     @DeleteMapping(path = "/delete")
     public void delete(JwtAuthentication auth) {
         userService.delete(auth.getUserId());
+    }
+
+    @AllUserAuth
+    @PatchMapping(path = "/password")
+    public void updatePwd(@RequestBody PasswordUpdateRequest request, JwtAuthentication auth) {
+        userService.updatePwd(request, auth.getUserId());
     }
 
     @PostMapping(path = "/signup")
