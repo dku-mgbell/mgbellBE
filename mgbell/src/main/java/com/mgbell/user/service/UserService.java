@@ -5,9 +5,7 @@ import com.mgbell.global.auth.jwt.JwtToken;
 import com.mgbell.user.exception.IncorrectPassword;
 import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.exception.UserNotFoundException;
-import com.mgbell.user.model.dto.request.LoginRequest;
-import com.mgbell.user.model.dto.request.OAuthSignupRequest;
-import com.mgbell.user.model.dto.request.SignupRequest;
+import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
@@ -75,6 +73,15 @@ public class UserService {
     }
 
     @Transactional
+    public void edit(UserEditRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setName(request.getName());
+        user.setPhoneNumber(request.getPhoneNumber());
+    }
+
+    @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
@@ -85,5 +92,12 @@ public class UserService {
             user.setStore(null);
         }
         userRepository.deleteById(id);
+    }
+
+    public void updatePwd(PasswordUpdateRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 }
