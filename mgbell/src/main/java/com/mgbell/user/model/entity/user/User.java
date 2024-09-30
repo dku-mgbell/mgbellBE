@@ -20,10 +20,13 @@ public class User {
     @NotNull
     private String password;
     @NotNull
+    @Setter
     private String name;
     @NotNull
+    @Setter
     private String phoneNumber;
     @NotNull
+    @Setter
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
