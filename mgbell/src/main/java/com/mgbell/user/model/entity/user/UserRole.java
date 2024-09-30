@@ -37,6 +37,14 @@ public enum UserRole {
         return this == ADMIN;
     }
 
+    public boolean isOwner() {
+        return this == OWNER;
+    }
+
+    public boolean isUser() {
+        return this == USER;
+    }
+
     @JsonCreator
     public static UserRole from(String val) {
         for (UserRole role : UserRole.values()) {

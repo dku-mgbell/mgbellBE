@@ -41,11 +41,11 @@ public class Post {
     @Builder.Default
     private List<PickupTime> pickupTime = new ArrayList<>();
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

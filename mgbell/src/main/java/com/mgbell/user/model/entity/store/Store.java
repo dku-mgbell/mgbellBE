@@ -1,5 +1,6 @@
 package com.mgbell.user.model.entity.store;
 
+import com.mgbell.post.model.entity.Post;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,15 +33,16 @@ public class Store {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
     public Store(String name, String address, StoreType storeType, Status status, User user) {
         this.name = name;
         this.address = address;
         this.storeType = storeType;
         this.status = status;
-        this.user = user;
-    }
-
-    public void setUser(User user) {
         this.user = user;
     }
 }

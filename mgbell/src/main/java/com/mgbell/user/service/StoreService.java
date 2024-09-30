@@ -1,6 +1,7 @@
 package com.mgbell.user.service;
 
 import com.mgbell.user.exception.StoreNotFoundException;
+import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.StoreRegisterRequest;
 import com.mgbell.user.model.dto.response.StoreResponse;
@@ -24,24 +25,30 @@ public class StoreService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void register(StoreRegisterRequest request) {
-        User user = userRepository.findById(request.getUserId())
+    public void register(StoreRegisterRequest request, Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
+
+        if(user.getUserRole().isUser()) throw new UserHasNoAuthorityException();
 
         Store store = new Store(
                 request.getName(),
                 request.getAddress(),
                 request.getStoreType(),
+//                request.getImage(),
                 Status.INACTIVE,
                 user);
-
-//        user.setStore(store);
 
         storeRepository.save(store);
     }
 
     @Transactional
-    public void approve(Long storeId) {
+    public void approve(Long storeId, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!user.getUserRole().isAdmin()) throw new UserHasNoAuthorityException();
+
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
