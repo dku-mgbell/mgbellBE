@@ -1,16 +1,12 @@
 package com.mgbell.post.model.entity;
 
-import com.mgbell.user.model.entity.store.Store;
+import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +37,12 @@ public class Post {
     @Builder.Default
     private List<PickupTime> pickupTime = new ArrayList<>();
 
-    @OneToOne
+    @Setter
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @Setter
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
