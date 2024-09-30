@@ -37,10 +37,12 @@ public class Post {
     @Builder.Default
     private List<PickupTime> pickupTime = new ArrayList<>();
 
-    @OneToOne
+    @Setter
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @Setter
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

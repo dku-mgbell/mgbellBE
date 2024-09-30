@@ -29,12 +29,12 @@ public class Store {
     private Status status;
 
     @NotNull
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Setter
-    @OneToOne
+    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private Post post;
 
