@@ -1,5 +1,9 @@
 package com.mgbell.user.controller;
 
+import com.mgbell.global.auth.jwt.JwtAuthentication;
+import com.mgbell.global.config.swagger.AdminAuth;
+import com.mgbell.global.config.swagger.OwnerAuth;
+import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.user.model.dto.request.StoreRegisterRequest;
 import com.mgbell.user.model.dto.response.StoreResponse;
 import com.mgbell.user.service.StoreService;
@@ -15,14 +19,16 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreService storeService;
 
+    @OwnerAuth
     @PostMapping(path = "/register")
-    public void register(@RequestBody StoreRegisterRequest request){
-        storeService.register(request);
+    public void register(@RequestBody StoreRegisterRequest request, JwtAuthentication auth) {
+        storeService.register(request, auth.getUserId());
     }
 
+    @AdminAuth
     @PatchMapping(path = "/approve/{storeId}")
-    public void approve(@PathVariable("storeId") Long storeId) {
-        storeService.approve(storeId);
+    public void approve(@PathVariable("storeId") Long storeId, JwtAuthentication auth) {
+        storeService.approve(storeId, auth.getUserId());
     }
 
     @GetMapping(path = "/all")
