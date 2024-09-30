@@ -9,7 +9,9 @@ import com.mgbell.user.model.dto.request.LoginRequest;
 import com.mgbell.user.model.dto.request.OAuthSignupRequest;
 import com.mgbell.user.model.dto.request.SignupRequest;
 import com.mgbell.user.model.dto.response.LoginResponse;
+import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
+import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final StoreRepository storeRepository;
 
     public void signUp(SignupRequest request) {
         if(isDuplicateEmail(request.getEmail())) {
@@ -69,5 +72,18 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
         return user.getEmail();
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+        Store store = user.getStore();
+
+        if (store != null) {
+            store.setPost(null);
+            user.setStore(null);
+        }
+        userRepository.deleteById(id);
     }
 }

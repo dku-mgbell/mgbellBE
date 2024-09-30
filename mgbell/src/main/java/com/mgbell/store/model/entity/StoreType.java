@@ -1,4 +1,4 @@
-package com.mgbell.user.model.entity.store;
+package com.mgbell.store.model.entity;
 
 import lombok.Getter;
 

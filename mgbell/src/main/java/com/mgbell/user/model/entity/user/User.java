@@ -1,6 +1,6 @@
 package com.mgbell.user.model.entity.user;
 
-import com.mgbell.user.model.entity.store.Store;
+import com.mgbell.store.model.entity.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -31,6 +31,6 @@ public class User {
     private UserRole userRole;
 
     @Setter
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Store store;
 }

@@ -1,16 +1,16 @@
-package com.mgbell.user.controller;
+package com.mgbell.store.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.AdminAuth;
 import com.mgbell.global.config.swagger.OwnerAuth;
-import com.mgbell.global.config.swagger.UserAuth;
-import com.mgbell.user.model.dto.request.StoreRegisterRequest;
-import com.mgbell.user.model.dto.response.StoreResponse;
-import com.mgbell.user.service.StoreService;
-import lombok.AllArgsConstructor;
+import com.mgbell.store.model.dto.request.StoreEditRequest;
+import com.mgbell.store.model.dto.request.StoreRegisterRequest;
+import com.mgbell.store.model.dto.response.StoreResponse;
+import com.mgbell.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +24,26 @@ public class StoreController {
     public void register(@RequestBody StoreRegisterRequest request, JwtAuthentication auth) {
         storeService.register(request, auth.getUserId());
     }
+
+    @OwnerAuth
+    @PatchMapping(path = "/edit")
+    public void edit(@RequestBody StoreEditRequest request, JwtAuthentication auth) {
+        storeService.edit(request, auth.getUserId());
+    }
+
+    @OwnerAuth
+    @GetMapping
+    public ResponseEntity<StoreResponse> getStoreInfo(JwtAuthentication auth) {
+        return ResponseEntity.ok(storeService.getStoreInfo(auth.getUserId()));
+    }
+
+    @OwnerAuth
+    @DeleteMapping
+    public void delete(JwtAuthentication auth) {
+        storeService.delete(auth.getUserId());
+    }
+
+
 
     @AdminAuth
     @PatchMapping(path = "/approve/{storeId}")

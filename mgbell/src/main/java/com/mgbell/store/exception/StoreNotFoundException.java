@@ -1,4 +1,4 @@
-package com.mgbell.user.exception;
+package com.mgbell.store.exception;
 
 public class StoreNotFoundException extends RuntimeException {
     public StoreNotFoundException() {

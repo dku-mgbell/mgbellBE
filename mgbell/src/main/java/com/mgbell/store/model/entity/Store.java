@@ -1,4 +1,4 @@
-package com.mgbell.user.model.entity.store;
+package com.mgbell.store.model.entity;
 
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.user.model.entity.user.User;
@@ -34,7 +34,7 @@ public class Store {
     private User user;
 
     @Setter
-    @OneToOne
+    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private Post post;
 
