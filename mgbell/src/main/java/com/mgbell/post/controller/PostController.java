@@ -3,6 +3,7 @@ package com.mgbell.post.controller;
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
+import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,17 +23,26 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/list")
-    public ResponseEntity<Page<PostPreviewResponse>> list(Pageable pageable) {
-        Page<PostPreviewResponse> posts = postService.showAllPost(pageable);
+    public ResponseEntity<Page<PostPreviewResponse>> list(
+            PostPreviewRequest request,
+            Pageable pageable) {
+
+        Page<PostPreviewResponse> posts = postService.showAllPost(pageable, request);
 
         return ResponseEntity.ok(posts);
     }
 
     @OwnerAuth
     @PostMapping
-    @Operation(summary = "게시글 생성")
+    @Operation(summary = "마감백 등록")
     public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
         postService.create(request, auth.getUserId());
+    }
+
+    @OwnerAuth
+    @DeleteMapping
+    public void delete(JwtAuthentication auth) {
+        postService.delete(auth.getUserId());
     }
 
 }

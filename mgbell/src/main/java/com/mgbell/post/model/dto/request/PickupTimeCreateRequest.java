@@ -1,21 +1,23 @@
 package com.mgbell.post.model.dto.request;
 
-import com.mgbell.post.model.entity.Week;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PickupTimeCreateRequest {
-    @NotNull(message = "week error")
-    private Week dayOfWeek;
+    @NotNull(message = "onSale error")
+    private boolean onSale;
     @NotNull(message = "startAt error")
-    private LocalDateTime startAt;
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime startAt;
     @NotNull(message = "endAt error")
-    private LocalDateTime endAt;
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime endAt;
 }

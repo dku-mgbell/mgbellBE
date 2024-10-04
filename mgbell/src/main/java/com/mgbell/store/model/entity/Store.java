@@ -34,7 +34,7 @@ public class Store {
     private User user;
 
     @Setter
-    @OneToOne(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
 
