@@ -45,12 +45,14 @@ public class PostService {
         Post post = Post.builder()
                 .user(user)
                 .store(store)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .cost(request.getCost())
+                .bagName(request.getBagName())
+                .description(request.getDescription())
+                .costPrice(request.getCostPrice())
+                .salePrice(request.getSalePrice())
                 .amount(request.getAmount())
                 .build();
 
+        store.setPost(post);
         savePickupTime(request.getPickupTime(), post);
 
         postRepository.save(post);
@@ -69,32 +71,31 @@ public class PostService {
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
 
+            PickupTime currPickupTime = currPost.getPickupTime();
+
             return new PostPreviewResponse(
                     currPost.getPostId(),
-                    currPost.getTitle(),
                     currPost.getStore().getName(),
-                    currPost.getCost(),
+                    currPost.getBagName(),
+                    currPickupTime.isOnSale(),
+                    currPickupTime.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPickupTime.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.getCostPrice(),
+                    currPost.getSalePrice(),
                     currPost.getAmount());
         });
     }
 
     @Transactional
-    public void savePickupTime(ArrayList<PickupTimeCreateRequest> times, Post post) {
-        List<PickupTime> pickupTimes = new ArrayList<>();
+    public void savePickupTime(PickupTimeCreateRequest request, Post post) {
+        PickupTime pickupTime = PickupTime.builder()
+                .onSale(request.isOnSale())
+                .startAt(request.getStartAt())
+                .endAt(request.getEndAt())
+                .build();
 
-        for (PickupTimeCreateRequest time : times) {
-            PickupTime pickupTime = PickupTime.builder()
-                    .weekOfWeek(time.getDayOfWeek())
-                    .startAt(time.getStartAt())
-                    .endAt(time.getEndAt())
-                    .build();
-
-            pickupTimes.add(pickupTime);
-        }
-
-        for (PickupTime time : pickupTimes) {
-            time.setPost(post);
-        }
+        pickupTime.setPost(post);
+        post.setPickupTime(pickupTime);
 
         log.info("savePickupTime!");
     }
