@@ -3,6 +3,7 @@ package com.mgbell.post.controller;
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
+import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,12 @@ public class PostController {
     @Operation(summary = "게시글 생성")
     public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
         postService.create(request, auth.getUserId());
+    }
+
+    @OwnerAuth
+    @DeleteMapping
+    public void delete(JwtAuthentication auth) {
+        postService.delete(auth.getUserId());
     }
 
 }

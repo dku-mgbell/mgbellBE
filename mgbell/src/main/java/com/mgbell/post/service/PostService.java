@@ -58,6 +58,25 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        Post post = postRepository.findByUserId(id)
+                .orElseThrow(PostNotFoundException::new);
+
+        Store store = user.getStore();
+
+        if(!id.equals(post.getUser().getId())) {
+            throw new UserHasNoAuthorityException();
+        }
+
+        store.setPost(null);
+        post.setStore(null);
+        postRepository.delete(post);
+    }
+
     private Page<PostPreviewResponse> getPostResponses(Page<Post> posts) {
         return posts.map(currPost -> {
 //            List<PostFileResponse> files = currPost.getFiles().stream()
