@@ -1,11 +1,15 @@
 package com.mgbell.post.service;
 
+import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.PickupTimeCreateRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
+import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.model.entity.PickupTime;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
+import com.mgbell.post.repository.PostRepositoryCustom;
+import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
@@ -18,20 +22,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
     private final UserRepository userRepository;
-    private final StoreRepository storeRepository;
 
 
-    public Page<PostPreviewResponse> showAllPost(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
+    public Page<PostPreviewResponse> showAllPost(Pageable pageable, PostPreviewRequest request) {
+
+        Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
         return getPostResponses(posts);
     }
@@ -45,15 +49,36 @@ public class PostService {
         Post post = Post.builder()
                 .user(user)
                 .store(store)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .cost(request.getCost())
+                .bagName(request.getBagName())
+                .description(request.getDescription())
+                .costPrice(request.getCostPrice())
+                .salePrice(request.getSalePrice())
                 .amount(request.getAmount())
                 .build();
 
+        store.setPost(post);
         savePickupTime(request.getPickupTime(), post);
 
         postRepository.save(post);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        Post post = postRepository.findByUserId(id)
+                .orElseThrow(PostNotFoundException::new);
+
+        Store store = user.getStore();
+
+        if(!id.equals(post.getUser().getId())) {
+            throw new UserHasNoAuthorityException();
+        }
+
+        store.setPost(null);
+        post.setStore(null);
+        postRepository.delete(post);
     }
 
     private Page<PostPreviewResponse> getPostResponses(Page<Post> posts) {
@@ -69,34 +94,32 @@ public class PostService {
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
 
+            PickupTime currPickupTime = currPost.getPickupTime();
+
             return new PostPreviewResponse(
                     currPost.getPostId(),
-                    currPost.getTitle(),
                     currPost.getStore().getName(),
-                    currPost.getCost(),
+                    currPost.getBagName(),
+                    currPickupTime.isOnSale(),
+                    currPickupTime.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPickupTime.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.getCostPrice(),
+                    currPost.getSalePrice(),
                     currPost.getAmount());
         });
     }
 
     @Transactional
-    public void savePickupTime(ArrayList<PickupTimeCreateRequest> times, Post post) {
-        List<PickupTime> pickupTimes = new ArrayList<>();
+    public void savePickupTime(PickupTimeCreateRequest request, Post post) {
+        PickupTime pickupTime = PickupTime.builder()
+                .onSale(request.isOnSale())
+                .startAt(request.getStartAt())
+                .endAt(request.getEndAt())
+                .build();
 
-        for (PickupTimeCreateRequest time : times) {
-            PickupTime pickupTime = PickupTime.builder()
-                    .weekOfWeek(time.getDayOfWeek())
-                    .startAt(time.getStartAt())
-                    .endAt(time.getEndAt())
-                    .build();
-
-            pickupTimes.add(pickupTime);
-        }
-
-        for (PickupTime time : pickupTimes) {
-            time.setPost(post);
-        }
+        pickupTime.setPost(post);
+        post.setPickupTime(pickupTime);
 
         log.info("savePickupTime!");
     }
-
 }

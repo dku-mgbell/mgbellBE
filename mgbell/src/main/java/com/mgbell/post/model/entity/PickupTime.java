@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Getter
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PickupTime {
@@ -17,23 +17,15 @@ public class PickupTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private Week weekOfWeek;
+    private boolean onSale;
     @NotNull
-    private LocalDateTime startAt;
+    private LocalTime startAt;
     @NotNull
-    private LocalDateTime endAt;
+    private LocalTime endAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Setter
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public void setPost(Post post) {
-        if (this.post != null) {
-            this.post.getPickupTime().remove(this);
-        }
-
-        this.post = post;
-        this.post.getPickupTime().add(this);
-    }
 }

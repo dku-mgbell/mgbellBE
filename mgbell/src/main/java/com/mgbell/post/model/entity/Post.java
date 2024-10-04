@@ -21,24 +21,26 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
     @NotBlank
-    private String title;
+    private String bagName;
     @NotBlank
-    private String content;
+    private String description;
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private Cost cost;
+    private int costPrice;
+    @NotNull
+    private int salePrice;
     @NotNull
     private int amount;
 
 //    @NotNull
 //    private String image;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @Builder.Default
-    private List<PickupTime> pickupTime = new ArrayList<>();
+    @Setter
+    @OneToOne(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "pickup_time_id")
+    private PickupTime pickupTime;
 
     @Setter
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
     private Store store;
 
