@@ -1,11 +1,15 @@
 package com.mgbell.post.service;
 
+import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.PickupTimeCreateRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
+import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.model.entity.PickupTime;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
+import com.mgbell.post.repository.PostRepositoryCustom;
+import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
@@ -18,20 +22,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
     private final UserRepository userRepository;
-    private final StoreRepository storeRepository;
 
 
-    public Page<PostPreviewResponse> showAllPost(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
+    public Page<PostPreviewResponse> showAllPost(Pageable pageable, PostPreviewRequest request) {
+
+        Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
         return getPostResponses(posts);
     }
@@ -118,5 +122,4 @@ public class PostService {
 
         log.info("savePickupTime!");
     }
-
 }
