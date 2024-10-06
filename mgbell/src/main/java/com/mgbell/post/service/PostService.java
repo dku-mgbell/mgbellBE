@@ -1,19 +1,19 @@
 package com.mgbell.post.service;
 
 import com.mgbell.post.exception.PostNotFoundException;
-import com.mgbell.post.model.dto.request.PickupTimeCreateRequest;
-import com.mgbell.post.model.dto.request.PostCreateRequest;
-import com.mgbell.post.model.dto.request.PostPreviewRequest;
+import com.mgbell.post.model.dto.request.*;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.model.entity.PickupTime;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
+import com.mgbell.user.exception.UserHasNoPostException;
+import com.mgbell.user.exception.UserHasNoStoreException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
-import com.mgbell.store.repository.StoreRepository;
+import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -43,6 +43,8 @@ public class PostService {
     public void create(PostCreateRequest request, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
+
+        if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
 
         Store store = user.getStore();
 
@@ -89,6 +91,8 @@ public class PostService {
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
+
+        checkOwner(user);
 
         Post post = postRepository.findByUserId(id)
                 .orElseThrow(PostNotFoundException::new);
@@ -145,4 +149,11 @@ public class PostService {
 
         log.info("savePickupTime!");
     }
+
+    private void checkOwner(User user) {
+        if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
+        if(user.getStore() == null) throw new UserHasNoStoreException();
+        if(user.getStore().getPost() == null) throw new UserHasNoPostException();
+    }
+
 }
