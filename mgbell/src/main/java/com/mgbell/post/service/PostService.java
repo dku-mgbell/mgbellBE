@@ -63,6 +63,29 @@ public class PostService {
     }
 
     @Transactional
+    public void update(PostUpdateRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        checkOwner(user);
+
+        Post post = user.getStore().getPost();
+
+        // Todo 어디까지 수정할 지 정하기
+    }
+
+    @Transactional
+    public void changeOnSale(OnSaleRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        checkOwner(user);
+
+        PickupTime pickupTime = user.getStore().getPost().getPickupTime();
+        pickupTime.setOnSale(request.isOnSale());
+    }
+
+    @Transactional
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
