@@ -17,6 +17,7 @@ public class PickupTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
+    @Setter
     private boolean onSale;
     @NotNull
     private LocalTime startAt;

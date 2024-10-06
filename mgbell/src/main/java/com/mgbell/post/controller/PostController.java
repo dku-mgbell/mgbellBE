@@ -2,6 +2,7 @@ package com.mgbell.post.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
+import com.mgbell.post.model.dto.request.OnSaleRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
@@ -38,6 +39,20 @@ public class PostController {
     public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
         postService.create(request, auth.getUserId());
     }
+
+    @OwnerAuth
+    @PostMapping("/onSale")
+    @Operation(summary = "마감백 판매 여부 on/off")
+    public void onSale(@RequestBody OnSaleRequest request, JwtAuthentication auth) {
+        postService.changeOnSale(request, auth.getUserId());
+    }
+
+//    @OwnerAuth
+//    @PatchMapping
+//    @Operation(summary = "마감백 수정")
+//    public void update(@RequestBody @Validated PostUpdateRequest request, JwtAuthentication auth) {
+//        postService.update(request, auth.getUserId());
+//    }
 
     @OwnerAuth
     @DeleteMapping
