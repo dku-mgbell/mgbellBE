@@ -3,7 +3,6 @@ package com.mgbell.post.service;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
-import com.mgbell.post.model.entity.PickupTime;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
@@ -56,10 +55,12 @@ public class PostService {
                 .costPrice(request.getCostPrice())
                 .salePrice(request.getSalePrice())
                 .amount(request.getAmount())
+                .onSale(request.isOnSale())
+                .startAt(request.getStartAt())
+                .endAt(request.getEndAt())
                 .build();
 
         store.setPost(post);
-        savePickupTime(request.getPickupTime(), post);
 
         postRepository.save(post);
     }
@@ -73,7 +74,16 @@ public class PostService {
 
         Post post = user.getStore().getPost();
 
-        // Todo 어디까지 수정할 지 정하기
+        post.updatePost(
+                request.getBagName(),
+                request.getDescription(),
+                request.getCostPrice(),
+                request.getSalePrice(),
+                request.getAmount(),
+                request.isOnSale(),
+                request.getStartAt(),
+                request.getEndAt()
+        );
     }
 
     @Transactional
@@ -83,8 +93,8 @@ public class PostService {
 
         checkOwner(user);
 
-        PickupTime pickupTime = user.getStore().getPost().getPickupTime();
-        pickupTime.setOnSale(request.isOnSale());
+        Post post = user.getStore().getPost();
+        post.setOnSale(request.isOnSale());
     }
 
     @Transactional
@@ -121,33 +131,17 @@ public class PostService {
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
 
-            PickupTime currPickupTime = currPost.getPickupTime();
-
             return new PostPreviewResponse(
                     currPost.getPostId(),
                     currPost.getStore().getName(),
                     currPost.getBagName(),
-                    currPickupTime.isOnSale(),
-                    currPickupTime.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    currPickupTime.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.isOnSale(),
+                    currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getCostPrice(),
                     currPost.getSalePrice(),
                     currPost.getAmount());
         });
-    }
-
-    @Transactional
-    public void savePickupTime(PickupTimeCreateRequest request, Post post) {
-        PickupTime pickupTime = PickupTime.builder()
-                .onSale(request.isOnSale())
-                .startAt(request.getStartAt())
-                .endAt(request.getEndAt())
-                .build();
-
-        pickupTime.setPost(post);
-        post.setPickupTime(pickupTime);
-
-        log.info("savePickupTime!");
     }
 
     private void checkOwner(User user) {

@@ -1,5 +1,6 @@
 package com.mgbell.post.model.entity;
 
+import com.mgbell.global.util.BaseEntity;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,14 +32,16 @@ public class Post {
     private int salePrice;
     @NotNull
     private int amount;
+    @NotNull
+    @Setter
+    private boolean onSale;
+    @NotNull
+    private LocalTime startAt;
+    @NotNull
+    private LocalTime endAt;
 
 //    @NotNull
 //    private String image;
-
-    @Setter
-    @OneToOne(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JoinColumn(name = "pickup_time_id")
-    private PickupTime pickupTime;
 
     @Setter
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
@@ -48,5 +52,17 @@ public class Post {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void updatePost(String bagName, String description, int costPrice, int salePrice,
+                           int amount, boolean onSale, LocalTime startAt, LocalTime endAt) {
+        this.bagName = bagName;
+        this.description = description;
+        this.costPrice = costPrice;
+        this.salePrice = salePrice;
+        this.amount = amount;
+        this.onSale = onSale;
+        this.startAt = startAt;
+        this.endAt = endAt;
+    }
 
 }
