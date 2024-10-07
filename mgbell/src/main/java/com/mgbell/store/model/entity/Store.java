@@ -1,5 +1,6 @@
 package com.mgbell.store.model.entity;
 
+import com.mgbell.global.util.BaseEntity;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
@@ -11,7 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Store {
+public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,5 +45,11 @@ public class Store {
         this.storeType = storeType;
         this.status = status;
         this.user = user;
+    }
+
+    public void updateStore(String name, String address, StoreType storeType) {
+        this.name = name;
+        this.address = address;
+        this.storeType = storeType;
     }
 }
