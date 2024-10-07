@@ -5,6 +5,7 @@ import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.post.model.dto.request.OnSaleRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.request.PostPreviewRequest;
+import com.mgbell.post.model.dto.request.PostUpdateRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,12 +48,12 @@ public class PostController {
         postService.changeOnSale(request, auth.getUserId());
     }
 
-//    @OwnerAuth
-//    @PatchMapping
-//    @Operation(summary = "마감백 수정")
-//    public void update(@RequestBody @Validated PostUpdateRequest request, JwtAuthentication auth) {
-//        postService.update(request, auth.getUserId());
-//    }
+    @OwnerAuth
+    @PatchMapping
+    @Operation(summary = "마감백 수정")
+    public void update(@RequestBody @Validated PostUpdateRequest request, JwtAuthentication auth) {
+        postService.update(request, auth.getUserId());
+    }
 
     @OwnerAuth
     @DeleteMapping

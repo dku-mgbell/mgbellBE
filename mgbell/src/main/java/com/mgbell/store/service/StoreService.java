@@ -1,6 +1,7 @@
 package com.mgbell.store.service;
 
 import com.mgbell.store.exception.AlreadyHasStoreException;
+import com.mgbell.store.exception.NotEnoughTimeHasPassedException;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
@@ -14,10 +15,14 @@ import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class StoreService {
@@ -65,6 +70,18 @@ public class StoreService {
 
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
+
+//        LocalDateTime updateAt = store.getUpdatedAt();
+//        if(updateAt != null && updateAt.isAfter(LocalDateTime.now().minusMinutes(5))) {
+//            log.info(LocalDateTime.now().toString());
+//            throw new NotEnoughTimeHasPassedException();
+//        }
+
+        store.updateStore(
+                request.getName(),
+                request.getAddress(),
+                request.getStoreType()
+        );
 
         store.setStatus(Status.INACTIVE);
     }

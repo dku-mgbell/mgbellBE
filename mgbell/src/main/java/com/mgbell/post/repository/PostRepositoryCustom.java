@@ -52,7 +52,7 @@ public class PostRepositoryCustom {
     }
 
     private BooleanExpression onSaleEq(Boolean onSale) {
-        return onSale != null ? post.pickupTime.onSale.eq(onSale) : null;
+        return onSale != null ? post.onSale.eq(onSale) : null;
     }
 
     private BooleanExpression storeEq(StoreType storeType) {
