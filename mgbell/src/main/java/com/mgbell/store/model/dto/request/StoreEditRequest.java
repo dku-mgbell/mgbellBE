@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 public class StoreEditRequest {
     private String name;
     private String address;
+    private String longitude;
+    private String latitude;
     private StoreType storeType;
 //    private MultipartFile image;
 }
