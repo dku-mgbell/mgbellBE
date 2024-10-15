@@ -40,6 +40,8 @@ public class StoreService {
         Store store = new Store(
                 request.getName(),
                 request.getAddress(),
+                request.getLongitude(),
+                request.getLatitude(),
                 request.getStoreType(),
 //                request.getImage(),
                 Status.INACTIVE,
@@ -80,6 +82,8 @@ public class StoreService {
         store.updateStore(
                 request.getName(),
                 request.getAddress(),
+                request.getLongitude(),
+                request.getLatitude(),
                 request.getStoreType()
         );
 

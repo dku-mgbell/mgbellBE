@@ -91,6 +91,7 @@ public class SecurityConfig {
                     authorizeRequests.requestMatchers("/post/**").permitAll();
                     authorizeRequests.requestMatchers("/email/**").permitAll();
                     authorizeRequests.requestMatchers("/oauth/**").permitAll();
+                    authorizeRequests.requestMatchers("/order/**").permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth ->
