@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +29,7 @@ public class Post extends BaseEntity {
     @NotNull
     private int salePrice;
     @NotNull
+    @Setter
     private int amount;
     @NotNull
     @Setter
