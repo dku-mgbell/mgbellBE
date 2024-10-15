@@ -1,9 +1,13 @@
 package com.mgbell.user.model.entity.user;
 
+import com.mgbell.order.model.entity.Order;
 import com.mgbell.store.model.entity.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -30,8 +34,21 @@ public class User {
     @Setter
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+    private int orderCnt;
+    private int carbonReduction;
+    private int totalDiscount;
 
     @Setter
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Store store;
+
+    @Setter
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Order> order = new ArrayList<>();
+
+    public void userOrderUpdate(int orderCnt, int carbonReduction, int totalDiscount) {
+        this.orderCnt += orderCnt;
+        this.carbonReduction += carbonReduction;
+        this.totalDiscount += totalDiscount;
+    }
 }

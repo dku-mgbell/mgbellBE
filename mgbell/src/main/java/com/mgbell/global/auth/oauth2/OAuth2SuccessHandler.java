@@ -35,8 +35,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // accessToken, refreshToken 발급
         JwtToken token = jwtProvider.issue(user);
-        log.info("userId: {}", user.getId());
-        log.info("accessToken: {}", token.getAccessToken());
 
         // 토큰 전달을 위한 redirect
         String redirectUrl = UriComponentsBuilder.fromUriString(URI)

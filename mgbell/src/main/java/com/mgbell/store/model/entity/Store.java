@@ -22,6 +22,10 @@ public class Store extends BaseEntity {
     @NotNull
     private String address;
     @NotNull
+    private String longitude;
+    @NotNull
+    private String latitude;
+    @NotNull
     @Enumerated(EnumType.STRING)
     private StoreType storeType;
     @Setter
@@ -39,17 +43,21 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Store(String name, String address, StoreType storeType, Status status, User user) {
+    public Store(String name, String address, String longitude, String latitude, StoreType storeType, Status status, User user) {
         this.name = name;
         this.address = address;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.storeType = storeType;
         this.status = status;
         this.user = user;
     }
 
-    public void updateStore(String name, String address, StoreType storeType) {
+    public void updateStore(String name, String address, String longitude, String latitude, StoreType storeType) {
         this.name = name;
         this.address = address;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.storeType = storeType;
     }
 }
