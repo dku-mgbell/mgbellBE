@@ -13,9 +13,8 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         servers = {
-                @Server(url = "https://15.165.235.145.nip.io", description = "https 서버"),
+                @Server(url = "https://mgbell-server.run", description = "도메인"),
                 @Server(url = "http://localhost:8080", description = "local 서버"),
-                @Server(url = "http://15.165.235.145:8080", description = "http 서버")
         },
         info = @Info(title = "Mgbell App", version = "v01"))
 @SecurityScheme(
