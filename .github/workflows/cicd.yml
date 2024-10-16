@@ -70,7 +70,9 @@ jobs:
 
     # gradle build
     - name: Build with Gradle
-      run: ./gradlew clean build -x test # 빌드에서 테스트 코드 제외
+      run: |
+        cd mgbell
+        ./gradlew clean build -x test # 빌드에서 테스트 코드 제외
 
     # docker build & push to production
     - name: Docker build & push
