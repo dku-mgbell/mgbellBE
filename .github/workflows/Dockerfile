@@ -1,5 +1,5 @@
 # open jdk 17 버전의 환경을 구성
-FROM adoptopenjdk/openjdk17:latest
+FROM openjdk:17-alpine
 
 # 노출할 포트를 설정
 EXPOSE 8080
@@ -12,4 +12,4 @@ ARG JAR_FILE=build/libs/mgbell-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
 
 # 운영 및 개발에서 사용되는 환경 설정을 분리
-ENTRYPOINT ["nohup", "java", "-jar", "/app.jar", "&"]
+ENTRYPOINT ["nohup", "java", "-jar", "app.jar", "&"]
