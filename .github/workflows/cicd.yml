@@ -54,7 +54,8 @@ jobs:
         contains(github.ref, 'main')
       run: |
         cd mgbell/src/main/resources # resources 폴더로 이동
-        rm application.properites
+        pwd
+        # rm application.properites
         touch ./application.properties # application.properties 생성
         echo "${{ secrets.PROPERTIES }}" > ./application.properties # github actions에서 설정한 값을 application.properties 파일에 쓰기
       shell: bash
