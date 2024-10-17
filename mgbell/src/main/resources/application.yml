@@ -27,19 +27,19 @@ spring:
       url: redis://${redis.password}@${redis.url}:${port}
       password: ${redis.password}
 jwt:
-  secret: ${jwt.secret}
+  secret: ${jwt.secrets}
   access:
-    expiration: ${jwt.access.expiration}
-    header: ${jwt.access.header}
+    expiration: ${jwt.accessexpire}
+    header: ${jwt.accessheader}
   refresh:
-    expiration: ${jwt.refresh.expiration}
-    header: ${jwt.refresh.header}
+    expiration: ${jwt.refreshexpire}
+    header: ${jwt.refreshheader}
 
 nhn:
-  email: ${nhn.email}
-  url: ${nhn.url}
-  secretKey: ${nhn.secretKey}
+  email: ${email}
+  url: ${naver.api}
+  secretKey: ${naver.secretKey}
 
 oauth:
-  uri: ${oauth.uri}
+  uri: ${redirect.uri}
 
