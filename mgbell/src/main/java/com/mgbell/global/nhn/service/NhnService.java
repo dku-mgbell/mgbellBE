@@ -21,7 +21,7 @@ public class NhnService {
 
     @Value("${nhn.email}")
     private String NHN_SENDER_EMAIL;
-    @Value("${nhn.host}")
+    @Value("${nhn.url}")
     private String NHN_URL;
     @Value("${nhn.secretKey}")
     private String NHN_SECRET_KEY;
