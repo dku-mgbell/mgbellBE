@@ -26,6 +26,14 @@ spring:
       port: ${redis.port}
       url: redis://${redis.password}@${redis.url}:${port}
       password: ${redis.password}
+jwt:
+  secret: ${jwt.secret}
+  access:
+    expiration: ${jwt.access.expiration}
+    header: ${jwt.access.header}
+  refresh:
+    expiration: ${jwt.refresh.expiration}
+    header: ${jwt.refresh.header}
 
 nhn:
   email: ${nhn.email}
