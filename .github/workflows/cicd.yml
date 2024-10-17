@@ -97,7 +97,7 @@ jobs:
         script: |
           sudo docker ps
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-prod
-          sudo docker run --name server --rm -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/docker-prod
+          docker-compose up -d
           sudo docker image prune -f
 
       
