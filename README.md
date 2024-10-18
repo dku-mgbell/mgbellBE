@@ -74,11 +74,13 @@
 
 ## 📖 ERD
 
-![image.png](%E1%84%86%E1%85%A1%E1%84%80%E1%85%A1%E1%86%B7%E1%84%87%E1%85%A6%E1%86%AF%20%F0%9F%94%94%2010214cf1132680c7b966e1aa7bbeb6de/image.png)
+![image](https://github.com/user-attachments/assets/a4eca9c0-773f-49ea-aac0-1e34baf0b2dd)
+
 
 ## ⚙️ System Architecture
 
-![image.png](%E1%84%86%E1%85%A1%E1%84%80%E1%85%A1%E1%86%B7%E1%84%87%E1%85%A6%E1%86%AF%20%F0%9F%94%94%2010214cf1132680c7b966e1aa7bbeb6de/image%201.png)
+<img width="838" alt="image" src="https://github.com/user-attachments/assets/88be2b3d-99c5-4e7c-9114-51dcbecb5650">
+
 
 ## 📚 Stacks
 
@@ -114,7 +116,8 @@
 
 ### ⌨️ 애자일 스크럼 방식을 이용하여 개발 계획 수립
 
-![image.png](%E1%84%86%E1%85%A1%E1%84%80%E1%85%A1%E1%86%B7%E1%84%87%E1%85%A6%E1%86%AF%20%F0%9F%94%94%2010214cf1132680c7b966e1aa7bbeb6de/image%202.png)
+<img width="885" alt="image" src="https://github.com/user-attachments/assets/2825c05f-4172-4a63-8fdd-7a0bbbd563c4">
+
 
 - 총 7번의 스프린트를 통해 개발하는 계획
 - 매주 금요일 스크럼을 통해 스프린트당 총 2회의 정기회의를 진행
