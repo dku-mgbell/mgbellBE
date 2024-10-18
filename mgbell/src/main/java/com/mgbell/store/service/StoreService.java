@@ -123,6 +123,8 @@ public class StoreService {
                 .id(store.getId())
                 .name(store.getName())
                 .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
                 .storeType(store.getStoreType())
                 .status(store.getStatus())
                 .build();
@@ -134,6 +136,8 @@ public class StoreService {
                         store.getId(),
                         store.getName(),
                         store.getAddress(),
+                        store.getLongitude(),
+                        store.getLatitude(),
                         store.getStoreType(),
                         store.getStatus()
                 ));
