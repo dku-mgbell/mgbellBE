@@ -138,6 +138,8 @@ public class PostService {
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.getStore().getLongitude(),
+                    currPost.getStore().getLatitude(),
                     currPost.getCostPrice(),
                     currPost.getSalePrice(),
                     currPost.getAmount());

@@ -14,6 +14,8 @@ public class PostPreviewResponse {
     private boolean onSale;
     private String startAt;
     private String endAt;
+    private String longitude;
+    private String latitude;
     private int costPrice;
     private int salePrice;
     private int amount;
