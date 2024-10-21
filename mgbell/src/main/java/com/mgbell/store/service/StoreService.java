@@ -104,6 +104,24 @@ public class StoreService {
         storeRepository.deleteById(id);
     }
 
+    public StoreForUserResponse getStore(Long storeId, Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(StoreNotFoundException::new);
+
+        return StoreForUserResponse.builder()
+                .storeName(store.getStoreName())
+                .businessRegiNum(store.getBusinessRegiNum())
+                .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
+                .startAt(store.getPost().getStartAt())
+                .endAt(store.getPost().getEndAt())
+                .build();
+    }
+
     public Page<StoreResponse> getAllStores(Pageable pageable) {
         Page<Store> stores = storeRepository.findAll(pageable);
 
