@@ -133,7 +133,7 @@ public class PostService {
 
             return new PostPreviewResponse(
                     currPost.getPostId(),
-                    currPost.getStore().getName(),
+                    currPost.getStore().getStoreName(),
                     currPost.getBagName(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
