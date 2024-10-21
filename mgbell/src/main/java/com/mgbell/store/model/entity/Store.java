@@ -18,7 +18,13 @@ public class Store extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    private String name;
+    private String storeName;
+    @NotNull
+    private String ownerName;
+    @NotNull
+    private String contact;
+    @NotNull
+    private String businessRegiNum;
     @NotNull
     private String address;
     @NotNull
@@ -43,8 +49,12 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Store(String name, String address, String longitude, String latitude, StoreType storeType, Status status, User user) {
-        this.name = name;
+    public Store(String storeName, String ownerName, String contact, String businessRegiNum,
+                 String address, String longitude, String latitude, StoreType storeType, Status status, User user) {
+        this.storeName = storeName;
+        this.ownerName = ownerName;
+        this.contact = contact;
+        this.businessRegiNum = businessRegiNum;
         this.address = address;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -53,11 +63,16 @@ public class Store extends BaseEntity {
         this.user = user;
     }
 
-    public void updateStore(String name, String address, String longitude, String latitude, StoreType storeType) {
-        this.name = name;
+
+    public void updateStore(@NotNull String storeName, @NotNull String ownerName, @NotNull String contact,
+                            @NotNull String address, String longitude, String latitude, StoreType storeType) {
+        this.storeName = storeName;
+        this.ownerName = ownerName;
+        this.contact = contact;
         this.address = address;
         this.longitude = longitude;
         this.latitude = latitude;
         this.storeType = storeType;
+        this.status = Status.INACTIVE;
     }
 }
