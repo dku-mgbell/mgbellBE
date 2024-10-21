@@ -3,6 +3,7 @@ package com.mgbell.post.service;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
+import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -37,6 +39,27 @@ public class PostService {
         Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
         return getPostResponses(posts);
+    }
+
+    public PostResponse getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+        Store store = post.getStore();
+
+        return PostResponse.builder()
+                .storeId(store.getId())
+                .storeName(store.getStoreName())
+                .bagName(post.getBagName())
+                .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
+                .onSale(post.isOnSale())
+                .amount(post.getAmount())
+                .startAt(post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .endAt(post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .costPrice(post.getCostPrice())
+                .salePrice(post.getSalePrice())
+                .build();
     }
 
     public void create(PostCreateRequest request, Long id) {
