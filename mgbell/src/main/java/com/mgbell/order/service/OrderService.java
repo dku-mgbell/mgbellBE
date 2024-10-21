@@ -81,7 +81,7 @@ public class OrderService {
                 new OrderResponse(
                     currOrder.getId(),
                     currOrder.getStore().getId(),
-                    currOrder.getStore().getName(),
+                    currOrder.getStore().getStoreName(),
                     currOrder.getStore().getAddress(),
                     currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currOrder.getRequest(),

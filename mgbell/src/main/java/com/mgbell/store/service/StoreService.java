@@ -3,6 +3,7 @@ package com.mgbell.store.service;
 import com.mgbell.store.exception.AlreadyHasStoreException;
 import com.mgbell.store.exception.NotEnoughTimeHasPassedException;
 import com.mgbell.store.exception.StoreNotFoundException;
+import com.mgbell.store.model.dto.response.StoreForUserResponse;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.store.model.dto.request.StoreEditRequest;
@@ -38,7 +39,10 @@ public class StoreService {
         if(user.getStore() != null) throw new AlreadyHasStoreException();
 
         Store store = new Store(
-                request.getName(),
+                request.getStoreName(),
+                request.getOwnerName(),
+                request.getContact(),
+                request.getBusinessRegiNum(),
                 request.getAddress(),
                 request.getLongitude(),
                 request.getLatitude(),
@@ -80,7 +84,9 @@ public class StoreService {
 //        }
 
         store.updateStore(
-                request.getName(),
+                request.getStoreName(),
+                request.getOwnerName(),
+                request.getContact(),
                 request.getAddress(),
                 request.getLongitude(),
                 request.getLatitude(),
@@ -96,6 +102,24 @@ public class StoreService {
                         .orElseThrow(StoreNotFoundException::new);
         store.setPost(null);
         storeRepository.deleteById(id);
+    }
+
+    public StoreForUserResponse getStore(Long storeId, Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(StoreNotFoundException::new);
+
+        return StoreForUserResponse.builder()
+                .storeName(store.getStoreName())
+                .businessRegiNum(store.getBusinessRegiNum())
+                .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
+                .startAt(store.getPost().getStartAt())
+                .endAt(store.getPost().getEndAt())
+                .build();
     }
 
     public Page<StoreResponse> getAllStores(Pageable pageable) {
@@ -115,13 +139,13 @@ public class StoreService {
         return getStoreResponse(stores);
     }
 
-    public StoreResponse getStoreInfo(Long id) {
+    public StoreResponse getMyStoreInfo(Long id) {
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
 
         return StoreResponse.builder()
                 .id(store.getId())
-                .name(store.getName())
+                .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())
@@ -134,7 +158,8 @@ public class StoreService {
         return stores.map(store ->
                 new StoreResponse(
                         store.getId(),
-                        store.getName(),
+                        store.getStoreName(),
+                        store.getBusinessRegiNum(),
                         store.getAddress(),
                         store.getLongitude(),
                         store.getLatitude(),
