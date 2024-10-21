@@ -25,6 +25,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/list")
+    @Operation(summary = "마감백 판매글 리스트")
     public ResponseEntity<Page<PostPreviewResponse>> list(
             PostPreviewRequest request,
             Pageable pageable) {
@@ -36,27 +37,28 @@ public class PostController {
 
     @OwnerAuth
     @PostMapping
-    @Operation(summary = "마감백 등록")
+    @Operation(summary = "사장님 API: 마감백 등록")
     public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
         postService.create(request, auth.getUserId());
     }
 
     @OwnerAuth
     @PostMapping("/onSale")
-    @Operation(summary = "마감백 판매 여부 on/off")
+    @Operation(summary = "사장님 API: 마감백 판매 여부 on/off")
     public void onSale(@RequestBody OnSaleRequest request, JwtAuthentication auth) {
         postService.changeOnSale(request, auth.getUserId());
     }
 
     @OwnerAuth
     @PatchMapping
-    @Operation(summary = "마감백 수정")
+    @Operation(summary = "사장님 API: 마감백 수정")
     public void update(@RequestBody @Validated PostUpdateRequest request, JwtAuthentication auth) {
         postService.update(request, auth.getUserId());
     }
 
     @OwnerAuth
     @DeleteMapping
+    @Operation(summary = "사장님 API: 판매글 삭제")
     public void delete(JwtAuthentication auth) {
         postService.delete(auth.getUserId());
     }
