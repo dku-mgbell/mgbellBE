@@ -7,6 +7,7 @@ import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.request.PostUpdateRequest;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
+import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -26,13 +27,17 @@ public class PostController {
 
     @GetMapping("/list")
     @Operation(summary = "마감백 판매글 리스트")
-    public ResponseEntity<Page<PostPreviewResponse>> list(
-            PostPreviewRequest request,
-            Pageable pageable) {
+    public ResponseEntity<Page<PostPreviewResponse>> list(PostPreviewRequest request, Pageable pageable) {
 
         Page<PostPreviewResponse> posts = postService.showAllPost(pageable, request);
 
         return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/{postId}")
+    @Operation(summary = "판매글 상세페이지")
+    public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 
     @OwnerAuth

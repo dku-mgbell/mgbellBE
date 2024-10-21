@@ -39,6 +39,8 @@ public class Store extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private int favorited;
+
     @NotNull
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -61,6 +63,7 @@ public class Store extends BaseEntity {
         this.storeType = storeType;
         this.status = status;
         this.user = user;
+        this.favorited = 0;
     }
 
 
@@ -74,5 +77,13 @@ public class Store extends BaseEntity {
         this.latitude = latitude;
         this.storeType = storeType;
         this.status = Status.INACTIVE;
+    }
+
+    public void increaseFavorited() {
+        this.favorited++;
+    }
+
+    public void decreaseFavorited() {
+        this.favorited--;
     }
 }
