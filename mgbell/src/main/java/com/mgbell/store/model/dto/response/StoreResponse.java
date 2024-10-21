@@ -11,8 +11,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class StoreResponse {
     private Long id;
-    private String name;
+    private String storeName;
+    private String businessRegiNum;
     private String address;
+    private String longitude;
+    private String latitude;
     private StoreType storeType;
     private Status status;
 }
