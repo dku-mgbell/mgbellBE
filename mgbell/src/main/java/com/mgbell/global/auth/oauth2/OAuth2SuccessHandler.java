@@ -26,12 +26,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Value("${oauth.uri}")
     private String URI;
     private final CustomOAuth2UserService oAuth2UserService;
-    private final UserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         User user = oAuth2UserService.getUser();
+        boolean isNewUser = oAuth2UserService.isNewUser();
 
         // accessToken, refreshToken 발급
         JwtToken token = jwtProvider.issue(user);
@@ -39,6 +39,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // 토큰 전달을 위한 redirect
         String redirectUrl = UriComponentsBuilder.fromUriString(URI)
                 .queryParam("accessToken", token.getAccessToken())
+                .queryParam("refreshToken", token.getRefreshToken())
+                .queryParam("isNewUser", isNewUser)
                 .build().toUriString();
 
         response.sendRedirect(redirectUrl);

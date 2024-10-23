@@ -45,10 +45,11 @@ public class UserController {
         userService.updatePwd(request, auth.getUserId());
     }
 
-    @PostMapping(path = "/signup")
+    @PostMapping(path = "/signup/{signupToken}")
     @Operation(summary = "회원가입")
-    public void signup(@RequestBody @Validated SignupRequest request) {
-        userService.signUp(request);
+    public void signup(@PathVariable String signupToken,
+                       @RequestBody @Validated SignupRequest request) {
+        userService.signUp(signupToken, request);
     }
 
     @PostMapping(path = "/dupCheck")

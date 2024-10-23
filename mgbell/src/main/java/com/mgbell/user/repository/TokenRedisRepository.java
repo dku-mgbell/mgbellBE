@@ -15,6 +15,12 @@ public class TokenRedisRepository {
         redisTemplate.opsForValue().set(email, token);
     }
 
+    public String resetToken(String email, String token) {
+        redisTemplate.opsForValue().setIfPresent(email, token);
+
+        return token;
+    }
+
     public String getToken(String email) {
         return redisTemplate.opsForValue().get(email);
     }

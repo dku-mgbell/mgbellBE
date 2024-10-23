@@ -1,5 +1,6 @@
 package com.mgbell.global.auth.oauth2;
 
+import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     @Getter
     private User user;
+    @Getter
+    private boolean isNewUser;
 
     @Transactional
     @Override
@@ -38,16 +41,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.of(registrationId, oAuth2UserAttributes);
 
         // 5. 회원가입 및 로그인
-        user = saveOrUpdate(oAuth2UserInfo);
+        saveOrUpdate(oAuth2UserInfo);
 
         // 6. OAuth2User로 반환
         return new PrincipalDetails(user, oAuth2UserAttributes, userNameAttributeName);
     }
 
-    private User saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
-        User user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
-                .orElse(oAuth2UserInfo.toEntity());
-        return userRepository.save(user);
+    private void saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
+        if(userRepository.existsByEmail(oAuth2UserInfo.getEmail())){
+            user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
+                    .orElseThrow(UserNotFoundException::new);
+            isNewUser = false;
+        } else {
+            isNewUser = true;
+            user = oAuth2UserInfo.toEntity();
+        }
     }
 
 }
