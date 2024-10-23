@@ -10,4 +10,5 @@ import lombok.Getter;
 public class TokenValidationResponse {
 
     private boolean valid;
+    private String signupToken;
 }
