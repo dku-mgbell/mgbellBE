@@ -54,7 +54,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             isNewUser = false;
         } else {
             isNewUser = true;
-            user = oAuth2UserInfo.toEntity();
+            user = userRepository.save(oAuth2UserInfo.toEntity());
         }
     }
 
