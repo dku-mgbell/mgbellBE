@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -153,16 +152,18 @@ public class PostService {
 //                        String url = fileUploadService.getFileUrl(file.getFileId());
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
+            Store store = currPost.getStore();
 
             return new PostPreviewResponse(
                     currPost.getPostId(),
-                    currPost.getStore().getStoreName(),
+                    store.getStoreName(),
                     currPost.getBagName(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    currPost.getStore().getLongitude(),
-                    currPost.getStore().getLatitude(),
+                    store.getAddress(),
+                    store.getLongitude(),
+                    store.getLatitude(),
                     currPost.getCostPrice(),
                     currPost.getSalePrice(),
                     currPost.getAmount());
