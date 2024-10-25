@@ -24,5 +24,4 @@ public class StoreRegisterRequest {
     private String latitude;
     @NotNull
     private StoreType storeType;
-//    private MultipartFile image;
 }
