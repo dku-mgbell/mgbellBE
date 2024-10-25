@@ -26,6 +26,18 @@ spring:
       port: ${redis.port}
       url: redis://${redis.password}@${redis.url}:${port}
       password: ${redis.password}
+  cloud:
+    aws:
+      credentials:
+        accessKey: ${s3.accessKey}
+        secretKey: ${s3.secretKey}
+      s3:
+        bucket: ${s3.name}
+      region:
+        static: ${s3.region}
+      stack:
+        auto: false
+
 jwt:
   secret: ${jwt.secrets}
   access:
@@ -42,4 +54,3 @@ nhn:
 
 oauth:
   uri: ${redirect.uri}
-

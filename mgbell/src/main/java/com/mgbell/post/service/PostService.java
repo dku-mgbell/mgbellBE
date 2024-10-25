@@ -7,6 +7,7 @@ import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
+import com.mgbell.store.model.entity.Image;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserHasNoPostException;
 import com.mgbell.user.exception.UserHasNoStoreException;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -45,6 +47,8 @@ public class PostService {
                 .orElseThrow(PostNotFoundException::new);
         Store store = post.getStore();
 
+        List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+
         return PostResponse.builder()
                 .storeId(store.getId())
                 .storeName(store.getStoreName())
@@ -58,6 +62,7 @@ public class PostService {
                 .endAt(post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")))
                 .costPrice(post.getCostPrice())
                 .salePrice(post.getSalePrice())
+                .images(images)
                 .build();
     }
 
@@ -153,6 +158,7 @@ public class PostService {
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
             Store store = currPost.getStore();
+            List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
 
             return new PostPreviewResponse(
                     currPost.getPostId(),
@@ -166,7 +172,8 @@ public class PostService {
                     store.getLatitude(),
                     currPost.getCostPrice(),
                     currPost.getSalePrice(),
-                    currPost.getAmount());
+                    currPost.getAmount(),
+                    images);
         });
     }
 
