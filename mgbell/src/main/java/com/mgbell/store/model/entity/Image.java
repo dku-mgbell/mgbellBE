@@ -22,7 +22,9 @@ public class Image extends BaseEntity {
     @NotNull
     private String contentType;
     @NotNull
-    private String fileDir;
+    private String originalFileDir;
+    @NotNull
+    private String thumbnailFileDir;
 
     @ManyToOne
     @JoinColumn(name = "store_id")
