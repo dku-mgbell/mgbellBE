@@ -13,8 +13,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/store")
@@ -23,17 +28,21 @@ public class StoreController {
     private final StoreService storeService;
 
     @OwnerAuth
-    @PostMapping(path = "/register")
+    @PostMapping(path = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "사장님 API: 가게 등록하기")
-    public void register(@RequestBody StoreRegisterRequest request, JwtAuthentication auth) {
-        storeService.register(request, auth.getUserId());
+    public void register(@RequestPart @Validated StoreRegisterRequest request,
+                         @RequestPart(required = false) List<MultipartFile> images,
+                         JwtAuthentication auth) {
+        storeService.register(request, images, auth.getUserId());
     }
 
     @OwnerAuth
-    @PatchMapping(path = "/edit")
+    @PatchMapping(path = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "사장님 API: 가게 정보 수정하기")
-    public void edit(@RequestBody StoreEditRequest request, JwtAuthentication auth) {
-        storeService.edit(request, auth.getUserId());
+    public void edit(@RequestPart @Validated StoreEditRequest request,
+                     @RequestPart(required = false) List<MultipartFile> images,
+                     JwtAuthentication auth) {
+        storeService.edit(request, images, auth.getUserId());
     }
 
     @OwnerAuth
