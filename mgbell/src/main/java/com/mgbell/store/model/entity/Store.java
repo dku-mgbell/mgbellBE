@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -40,6 +43,9 @@ public class Store extends BaseEntity {
     private Status status;
 
     private int favorited;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
 
     @NotNull
     @OneToOne
