@@ -13,6 +13,7 @@ public class PostPreviewResponse {
     private Long id;
     private String storeName;
     private String bagName;
+    private boolean favorite;
     private boolean onSale;
     private String startAt;
     private String endAt;

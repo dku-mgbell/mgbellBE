@@ -1,5 +1,6 @@
 package com.mgbell.post.service;
 
+import com.mgbell.favorite.repository.FavoriteRepository;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
@@ -33,19 +34,25 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostRepositoryCustom postRepositoryCustom;
     private final UserRepository userRepository;
+    private final FavoriteRepository favoriteRepository;
 
 
-    public Page<PostPreviewResponse> showAllPost(Pageable pageable, PostPreviewRequest request) {
+    public Page<PostPreviewResponse> showAllPost(Pageable pageable,
+                                                 PostPreviewRequest request,
+                                                 Long userId
+                                                 ) {
 
         Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
-        return getPostResponses(posts);
+        return getPostResponses(posts, userId);
     }
 
-    public PostResponse getPost(Long postId) {
+    public PostResponse getPost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
         Store store = post.getStore();
+
+        boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
         List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
 
@@ -53,6 +60,7 @@ public class PostService {
                 .storeId(store.getId())
                 .storeName(store.getStoreName())
                 .bagName(post.getBagName())
+                .favorite(favorite)
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())
@@ -145,7 +153,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private Page<PostPreviewResponse> getPostResponses(Page<Post> posts) {
+    private Page<PostPreviewResponse> getPostResponses(Page<Post> posts, Long userId) {
         return posts.map(currPost -> {
 //            List<PostFileResponse> files = currPost.getFiles().stream()
 //                    .map(file -> {
@@ -159,11 +167,13 @@ public class PostService {
 //                    }).collect(Collectors.toList());
             Store store = currPost.getStore();
             List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+            boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
             return new PostPreviewResponse(
                     currPost.getPostId(),
                     store.getStoreName(),
                     currPost.getBagName(),
+                    favorite,
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
