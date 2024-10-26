@@ -1,21 +1,22 @@
 package com.mgbell.order.model.dto.response;
 
-import com.mgbell.order.model.entity.Payment;
+import com.mgbell.order.model.entity.OrderState;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
-@Builder
 @AllArgsConstructor
-public class OrderResponse {
+@NoArgsConstructor
+public class UserOrderPreviewResponse {
     private Long orderId;
     private Long storeId;
+    private LocalDateTime orderDateTime;
     private String storeName;
-    private String address;
-    private String pickupTime;
-    private String request;
+    private String bagName;
+    private OrderState orderState;
     private int amount;
-    private Payment payment;
+    private int subTotal;
 }

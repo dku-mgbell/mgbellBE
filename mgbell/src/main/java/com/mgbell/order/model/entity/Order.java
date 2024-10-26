@@ -32,6 +32,8 @@ public class Order extends BaseEntity {
     private int subtotal;
     @Enumerated(EnumType.STRING)
     private Payment payment;
+    @Enumerated(EnumType.STRING)
+    private CancleReason cancleReason;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -41,4 +43,12 @@ public class Order extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
+    public void updateOrder(OrderState state) {
+        this.state = state;
+    }
+
+    public void updateCancleReason(CancleReason cancleReason) {
+        this.cancleReason = cancleReason;
+    }
 }
