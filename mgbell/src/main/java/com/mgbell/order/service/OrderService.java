@@ -200,20 +200,45 @@ public class OrderService {
     public Page<UserOrderPreviewResponse> getUserOrderList(Pageable pageable, Long id) {
         Page<Order> order = orderRepository.findByUserId(pageable, id);
 
-        return getOrderList(order);
+        return getUserOrderPreviewList(order);
     }
 
-    public Page<OrderResponse> getOrderList(Page<Order> list) {
+    public Page<OwnerOrderPreviewResponse> getOwnerOrderList(Pageable pageable, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Store store = user.getStore();
+
+        Page<Order> order = orderRepository.findByStoreId(pageable, store.getId());
+
+        return getOwnerOrderPreviewList(order);
+    }
+
+    public Page<UserOrderPreviewResponse> getUserOrderPreviewList(Page<Order> list) {
         return list.map(currOrder ->
-                new OrderResponse(
+                new UserOrderPreviewResponse(
                     currOrder.getId(),
                     currOrder.getStore().getId(),
+                    currOrder.getCreatedAt(),
                     currOrder.getStore().getStoreName(),
-                    currOrder.getStore().getAddress(),
-                    currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    currOrder.getRequest(),
+                    currOrder.getStore().getPost().getBagName(),
+                    currOrder.getState(),
                     currOrder.getAmount(),
-                    currOrder.getPayment()
+                    currOrder.getSubtotal()
+                ));
+    }
+
+    public Page<OwnerOrderPreviewResponse> getOwnerOrderPreviewList(Page<Order> list) {
+        return list.map(currOrder ->
+                new OwnerOrderPreviewResponse(
+                        currOrder.getId(),
+                        currOrder.getState(),
+                        currOrder.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        currOrder.getRequest(),
+                        currOrder.getAmount(),
+                        currOrder.getSubtotal(),
+                        currOrder.getPayment()
                 ));
     }
 }
