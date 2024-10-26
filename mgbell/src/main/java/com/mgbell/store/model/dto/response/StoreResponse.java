@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -18,4 +20,5 @@ public class StoreResponse {
     private String latitude;
     private StoreType storeType;
     private Status status;
+    private List<String> originalFileDir;
 }

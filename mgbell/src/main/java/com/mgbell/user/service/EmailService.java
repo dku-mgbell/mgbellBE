@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -33,9 +34,11 @@ public class EmailService {
     }
 
     public TokenValidationResponse validateToken(String email, String validToken) {
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
         return TokenValidationResponse.builder()
                 .valid(tokenRedisRepository.getToken(email).equals(validToken))
+                .signupToken(tokenRedisRepository.resetToken(email, uuid))
                 .build();
     }
 

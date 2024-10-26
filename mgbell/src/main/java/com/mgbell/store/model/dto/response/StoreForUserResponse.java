@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -17,4 +18,5 @@ public class StoreForUserResponse {
     private String latitude;
     private LocalTime startAt;
     private LocalTime endAt;
+    private List<String> originalFileDir;
 }

@@ -10,6 +10,7 @@ import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.store.repository.StoreRepository;
+import com.mgbell.user.repository.TokenRedisRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,17 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final TokenRedisRepository tokenRedisRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final StoreRepository storeRepository;
 
-    public void signUp(SignupRequest request) {
+    public void signUp(String signupToken, SignupRequest request) {
         if(isDuplicateEmail(request.getEmail())) {
             throw new UserAlreadyExistException();
+        }
+        if(!tokenRedisRepository.getToken(request.getEmail()).equals(signupToken)) {
+            throw new IncorrectPassword();
         }
 
         User user = User.builder()

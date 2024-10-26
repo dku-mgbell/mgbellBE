@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -13,6 +15,7 @@ public class PostResponse {
     private Long storeId;
     private String storeName;
     private String bagName;
+    private boolean favorite;
     private String address;
     private String longitude;
     private String latitude;
@@ -22,5 +25,5 @@ public class PostResponse {
     private String endAt;
     private int costPrice;
     private int salePrice;
-    //private List<Image> images = new ArrayList<>();
+    private List<String> images;
 }

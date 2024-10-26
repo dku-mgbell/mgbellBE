@@ -39,9 +39,6 @@ public class Post extends BaseEntity {
     @NotNull
     private LocalTime endAt;
 
-//    @NotNull
-//    private String image;
-
     @Setter
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
