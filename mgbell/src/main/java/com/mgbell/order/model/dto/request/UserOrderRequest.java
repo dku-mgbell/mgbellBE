@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderRequest {
+public class UserOrderRequest {
     @NotNull(message = "store id error")
     private Long storeId;
     @NotNull(message = "pick up time error")
