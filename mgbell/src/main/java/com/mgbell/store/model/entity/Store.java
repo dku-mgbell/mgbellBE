@@ -45,7 +45,7 @@ public class Store extends BaseEntity {
     private int favorited;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
+    private List<StoreImage> images = new ArrayList<>();
 
     @NotNull
     @OneToOne
