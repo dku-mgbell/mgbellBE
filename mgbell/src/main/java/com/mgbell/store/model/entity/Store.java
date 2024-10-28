@@ -2,6 +2,7 @@ package com.mgbell.store.model.entity;
 
 import com.mgbell.global.util.BaseEntity;
 import com.mgbell.post.model.entity.Post;
+import com.mgbell.review.model.entity.Review;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -60,6 +61,9 @@ public class Store extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @OneToMany
+    private List<Review> reviews = new ArrayList<>();
 
     public Store(String storeName, String ownerName, String contact, String businessRegiNum,
                  String address, String longitude, String latitude, StoreType storeType, Status status, User user) {
