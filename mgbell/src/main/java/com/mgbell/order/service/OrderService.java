@@ -1,6 +1,7 @@
 package com.mgbell.order.service;
 
 import com.mgbell.order.exception.AmountIsTooBigException;
+import com.mgbell.order.exception.OrderCompleteNotAvailableException;
 import com.mgbell.order.exception.OrderNotFoundException;
 import com.mgbell.order.model.dto.request.OwnerOrderCancleRequest;
 import com.mgbell.order.model.dto.request.UserOrderRequest;
@@ -139,6 +140,10 @@ public class OrderService {
 
         if(!order.getStore().getUser().getId().equals(userId)) {
             throw new UserHasNoAuthorityException();
+        }
+
+        if(order.getState() != OrderState.ACCEPTED) {
+            throw new OrderCompleteNotAvailableException();
         }
 
         order.updateOrder(OrderState.COMPLETED);
