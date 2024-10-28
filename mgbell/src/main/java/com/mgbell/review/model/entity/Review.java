@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class Review extends BaseEntity {
     private Long id;
 
     private String content;
+    private LocalDateTime ownerCommentDate;
     private String ownerComent;
 
     @NotNull
@@ -62,7 +64,8 @@ public class Review extends BaseEntity {
         this.satisfiedReasons = satisfiedReasons;
     }
 
-    public void ownerUpdateComent(String ownerComent) {
+    public void ownerUpdateComent(String ownerComent, LocalDateTime ownerCommentDate) {
         this.ownerComent = ownerComent;
+        this.ownerCommentDate = ownerCommentDate;
     }
 }
