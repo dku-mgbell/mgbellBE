@@ -8,7 +8,7 @@ import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
-import com.mgbell.store.model.entity.Image;
+import com.mgbell.store.model.entity.StoreImage;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserHasNoPostException;
 import com.mgbell.user.exception.UserHasNoStoreException;
@@ -54,13 +54,14 @@ public class PostService {
 
         boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
-        List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
 
         return PostResponse.builder()
                 .storeId(store.getId())
                 .storeName(store.getStoreName())
                 .bagName(post.getBagName())
                 .favorite(favorite)
+                .reviewCnt(store.getReviews().size())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())
@@ -166,7 +167,7 @@ public class PostService {
 //                        return new PostFileResponse(file, url);
 //                    }).collect(Collectors.toList());
             Store store = currPost.getStore();
-            List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+            List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
             boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
             return new PostPreviewResponse(

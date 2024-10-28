@@ -2,12 +2,12 @@ package com.mgbell.store.service;
 
 import com.mgbell.favorite.model.entity.Favorite;
 import com.mgbell.favorite.repository.FavoriteRepository;
-import com.mgbell.store.model.entity.Image;
+import com.mgbell.store.model.entity.StoreImage;
 import com.mgbell.global.s3.service.S3Service;
 import com.mgbell.store.exception.AlreadyHasStoreException;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.store.model.dto.response.StoreForUserResponse;
-import com.mgbell.store.repository.ImageRepository;
+import com.mgbell.store.repository.StoreImageRepository;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.store.model.dto.request.StoreEditRequest;
@@ -35,7 +35,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
-    private final ImageRepository imageRepository;
+    private final StoreImageRepository imageRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -132,7 +132,7 @@ public class StoreService {
 
             s3Service.upload(currImage, fileDir);
 
-            Image image = Image.builder()
+            StoreImage image = StoreImage.builder()
                     .contentType(currImage.getContentType())
                     .fileName(currImage.getOriginalFilename())
                     .originalFileDir(fileDir)
@@ -147,8 +147,8 @@ public class StoreService {
 
     @Transactional
     public void updateImages(Store store, List<MultipartFile> requestImages) {
-        List<Image> images = store.getImages();
-        for(Image image : images) {
+        List<StoreImage> images = store.getImages();
+        for(StoreImage image : images) {
             imageRepository.delete(image);
             s3Service.delete(image.getOriginalFileDir());
             s3Service.delete(image.getThumbnailFileDir());
@@ -164,7 +164,7 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
-        List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
 
         return StoreForUserResponse.builder()
                 .storeName(store.getStoreName())
@@ -198,7 +198,7 @@ public class StoreService {
     public StoreResponse getMyStoreInfo(Long id) {
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
-        List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
 
         return StoreResponse.builder()
                 .id(store.getId())
@@ -216,7 +216,7 @@ public class StoreService {
     public Page<StoreResponse> getStoreResponse(Page<Store> stores) {
 
         return stores.map(store -> {
-            List<String> images = store.getImages().stream().map(Image::getOriginalFileDir).toList();
+            List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
 
             return new StoreResponse(
                     store.getId(),
