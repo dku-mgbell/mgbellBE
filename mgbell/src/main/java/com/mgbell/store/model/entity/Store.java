@@ -43,6 +43,10 @@ public class Store extends BaseEntity {
     private Status status;
 
     private int favorited;
+    private int best;
+    private int good;
+    private int notBad;
+    private int notGood;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StoreImage> images = new ArrayList<>();
@@ -91,5 +95,30 @@ public class Store extends BaseEntity {
 
     public void decreaseFavorited() {
         this.favorited--;
+    }
+
+    public void increaseBest() {
+        this.best++;
+    }
+    public void decreaseBest() {
+        this.best--;
+    }
+    public void increaseGood() {
+        this.good++;
+    }
+    public void decreaseGood() {
+        this.good--;
+    }
+    public void increaseNotBad() {
+        this.notBad++;
+    }
+    public void decreaseNotBad() {
+        this.notBad--;
+    }
+    public void increaseNotGood() {
+        this.notGood++;
+    }
+    public void decreaseNotGood() {
+        this.notGood--;
     }
 }
