@@ -2,6 +2,7 @@ package com.mgbell.store.model.entity;
 
 import com.mgbell.global.util.BaseEntity;
 import com.mgbell.post.model.entity.Post;
+import com.mgbell.review.model.entity.Review;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,9 +44,13 @@ public class Store extends BaseEntity {
     private Status status;
 
     private int favorited;
+    private int best;
+    private int good;
+    private int notBad;
+    private int notGood;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
+    private List<StoreImage> images = new ArrayList<>();
 
     @NotNull
     @OneToOne
@@ -56,6 +61,9 @@ public class Store extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @OneToMany
+    private List<Review> reviews = new ArrayList<>();
 
     public Store(String storeName, String ownerName, String contact, String businessRegiNum,
                  String address, String longitude, String latitude, StoreType storeType, Status status, User user) {
@@ -91,5 +99,30 @@ public class Store extends BaseEntity {
 
     public void decreaseFavorited() {
         this.favorited--;
+    }
+
+    public void increaseBest() {
+        this.best++;
+    }
+    public void decreaseBest() {
+        this.best--;
+    }
+    public void increaseGood() {
+        this.good++;
+    }
+    public void decreaseGood() {
+        this.good--;
+    }
+    public void increaseNotBad() {
+        this.notBad++;
+    }
+    public void decreaseNotBad() {
+        this.notBad--;
+    }
+    public void increaseNotGood() {
+        this.notGood++;
+    }
+    public void decreaseNotGood() {
+        this.notGood--;
     }
 }

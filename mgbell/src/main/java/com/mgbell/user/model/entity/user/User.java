@@ -1,6 +1,7 @@
 package com.mgbell.user.model.entity.user;
 
 import com.mgbell.order.model.entity.Order;
+import com.mgbell.review.model.entity.Review;
 import com.mgbell.store.model.entity.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +46,10 @@ public class User {
     @Setter
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Order> order = new ArrayList<>();
+
+    @Setter
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Review> review = new ArrayList<>();
 
     public void userOrderUpdate(int orderCnt, int carbonReduction, int totalDiscount) {
         this.orderCnt += orderCnt;
