@@ -60,6 +60,7 @@ public class PostService {
                 .storeId(store.getId())
                 .storeName(store.getStoreName())
                 .bagName(post.getBagName())
+                .description(post.getDescription())
                 .favorite(favorite)
                 .reviewCnt(store.getReviews().size())
                 .address(store.getAddress())
