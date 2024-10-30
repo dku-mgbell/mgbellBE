@@ -15,6 +15,7 @@ public class PostResponse {
     private Long storeId;
     private String storeName;
     private String bagName;
+    private String description;
     private boolean favorite;
     private int reviewCnt;
     private String address;
