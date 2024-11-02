@@ -6,17 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserOrderPreviewResponse {
     private Long orderId;
-    private Long storeId;
+    private Long postId;
     private LocalDateTime orderDateTime;
     private String storeName;
     private String bagName;
     private OrderState orderState;
     private int amount;
     private int subTotal;
+    private String images;
 }

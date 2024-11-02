@@ -22,10 +22,13 @@ import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -36,6 +39,8 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    @Value("${s3.link}")
+    private String s3url;
 
     @Transactional
     public void userOrder(UserOrderRequest userOrderRequest, Long id) {
@@ -49,6 +54,8 @@ public class OrderService {
         int leftAmount = post.getAmount() - userOrderRequest.getAmount();
         if(leftAmount < 0) {
             throw new AmountIsTooBigException();
+        } else if(leftAmount == 0) {
+            post.setOnSale(false);
         }
 
         post.setAmount(leftAmount);
@@ -173,7 +180,8 @@ public class OrderService {
                 order.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                 order.getSubtotal(),
                 order.getRequest(),
-                order.getCancleReason()
+                order.getCancleReason(),
+        s3url + URLEncoder.encode(order.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
         );
     }
 
@@ -220,16 +228,18 @@ public class OrderService {
     }
 
     public Page<UserOrderPreviewResponse> getUserOrderPreviewList(Page<Order> list) {
+
         return list.map(currOrder ->
                 new UserOrderPreviewResponse(
                     currOrder.getId(),
-                    currOrder.getStore().getId(),
+                    currOrder.getStore().getPost().getPostId(),
                     currOrder.getCreatedAt(),
                     currOrder.getStore().getStoreName(),
                     currOrder.getStore().getPost().getBagName(),
                     currOrder.getState(),
                     currOrder.getAmount(),
-                    currOrder.getSubtotal()
+                    currOrder.getSubtotal(),
+            s3url + URLEncoder.encode(currOrder.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
                 ));
     }
 
