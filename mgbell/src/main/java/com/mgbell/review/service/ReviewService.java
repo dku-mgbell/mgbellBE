@@ -30,11 +30,14 @@ import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -49,6 +52,9 @@ public class ReviewService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final S3Service s3Service;
+
+    @Value("${s3.url}")
+    private String s3url;
 
     @Transactional
     public void userReivew(UserReviewRequest request, List<MultipartFile> requestImages, Long userId) {
@@ -147,7 +153,8 @@ public class ReviewService {
 
     public Page<OwnerReviewResponse> getOwnerReviewPage(Page<Review> reviews) {
         return reviews.map(currReview -> {
-            List<String> images = currReview.getImages().stream().map(ReviewImage::getOriginalFileDir).toList();
+            List<String> images = currReview.getImages().stream()
+                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
             return new OwnerReviewResponse(
                     currReview.getId(),
@@ -171,7 +178,9 @@ public class ReviewService {
 
     public Page<UserReviewResponse> getUserReviewPage(Page<Review> reviews) {
         return reviews.map(currReview -> {
-            List<String> images = currReview.getImages().stream().map(ReviewImage::getOriginalFileDir).toList();
+//            List<String> images = currReview.getImages().stream().map(ReviewImage::getOriginalFileDir).toList();
+            List<String> images = currReview.getImages().stream()
+                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
             return new UserReviewResponse(
                     currReview.getStore().getId(),
@@ -237,7 +246,8 @@ public class ReviewService {
                         currReview.getReviewScore(),
                         currReview.getContent(),
                         currReview.getSatisfiedReasons(),
-                        currReview.getImages().stream().map(ReviewImage::getOriginalFileDir).toList(),
+                        currReview.getImages().stream().map(currImage ->
+                                s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList(),
                         currReview.getOwnerComent()
                 ));
     }

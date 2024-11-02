@@ -54,3 +54,6 @@ nhn:
 
 oauth:
   uri: ${redirect.uri}
+
+s3:
+  url: ${s3.link}
