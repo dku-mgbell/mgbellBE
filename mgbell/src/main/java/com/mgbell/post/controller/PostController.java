@@ -1,6 +1,7 @@
 package com.mgbell.post.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
+import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.post.model.dto.request.OnSaleRequest;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private final PostService postService;
 
-    @UserAuth
+    @AllUserAuth
     @GetMapping("/list")
     @Operation(summary = "마감백 판매글 리스트")
     public ResponseEntity<Page<PostPreviewResponse>> list(PostPreviewRequest request,
@@ -38,7 +39,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    @UserAuth
+    @AllUserAuth
     @GetMapping("/{postId}")
     @Operation(summary = "판매글 상세페이지")
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId, JwtAuthentication auth) {
