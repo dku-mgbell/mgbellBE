@@ -19,24 +19,30 @@ import com.mgbell.user.model.entity.user.User;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
     private final StoreImageRepository imageRepository;
     private final S3Service s3Service;
+
+    @Value("${s3.url}")
+    private String s3url;
 
     @Transactional
     public void register(StoreRegisterRequest request, List<MultipartFile> requestImages, Long id) {
@@ -164,7 +170,8 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
-        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return StoreForUserResponse.builder()
                 .storeName(store.getStoreName())
@@ -198,7 +205,8 @@ public class StoreService {
     public StoreResponse getMyStoreInfo(Long id) {
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
-        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return StoreResponse.builder()
                 .id(store.getId())
@@ -216,7 +224,8 @@ public class StoreService {
     public Page<StoreResponse> getStoreResponse(Page<Store> stores) {
 
         return stores.map(store -> {
-            List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
+            List<String> images = store.getImages().stream()
+                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
             return new StoreResponse(
                     store.getId(),

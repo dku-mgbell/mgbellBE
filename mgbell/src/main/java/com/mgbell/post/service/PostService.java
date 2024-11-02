@@ -8,7 +8,6 @@ import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
-import com.mgbell.store.model.entity.StoreImage;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserHasNoPostException;
 import com.mgbell.user.exception.UserHasNoStoreException;
@@ -18,24 +17,29 @@ import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final PostRepositoryCustom postRepositoryCustom;
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
 
+    @Value("${s3.url}")
+    private String s3url;
 
     public Page<PostPreviewResponse> showAllPost(Pageable pageable,
                                                  PostPreviewRequest request,
@@ -54,7 +58,8 @@ public class PostService {
 
         boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
-        List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostResponse.builder()
                 .storeId(store.getId())
@@ -157,18 +162,9 @@ public class PostService {
 
     private Page<PostPreviewResponse> getPostResponses(Page<Post> posts, Long userId) {
         return posts.map(currPost -> {
-//            List<PostFileResponse> files = currPost.getFiles().stream()
-//                    .map(file -> {
-//                        String url = fileUploadService.getFileUrl(file.getFileId());
-//                        return new PostFileResponse(file, url);
-//                    }).collect(Collectors.toList());
-            //            List<PostFileResponse> files = currPost.getFiles().stream()
-//                    .map(file -> {
-//                        String url = fileUploadService.getFileUrl(file.getFileId());
-//                        return new PostFileResponse(file, url);
-//                    }).collect(Collectors.toList());
             Store store = currPost.getStore();
-            List<String> images = store.getImages().stream().map(StoreImage::getOriginalFileDir).toList();
+            List<String> images = store.getImages().stream()
+                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
             boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
             return new PostPreviewResponse(
