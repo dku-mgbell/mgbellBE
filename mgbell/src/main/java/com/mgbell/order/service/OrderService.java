@@ -102,7 +102,7 @@ public class OrderService {
 
         int cnt = order.getAmount();
         int totalAmount = post.getSalePrice() * cnt;
-        int carbonReduction = cnt * 2;
+        int carbonReduction = (post.getSalePrice() / 5900) * 2;
         int discount = (post.getCostPrice() * cnt) - totalAmount;
 
         user.userOrderUpdate(1, carbonReduction, discount);
