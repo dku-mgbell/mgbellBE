@@ -1,6 +1,9 @@
 package com.mgbell.global.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mgbell.global.auth.jwt.exception.InvalidTokenException;
+import com.mgbell.global.auth.jwt.exception.TokenExpiredException;
+import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -36,12 +40,13 @@ public class JwtProvider implements AuthenticationProvider {
     public static final String AUTHORIZATION = "Authorization";
 
     private final UserRepository userRepository;
+    private final TokenService tokenService;
     private final ObjectMapper objectMapper;
 
     public JwtToken issue(User user){
         return JwtToken.builder()
                 .accessToken(createAccessToken(user.getId().toString(), user.getUserRole()))
-                .refreshToken(createRefreshToken())
+                .refreshToken(createRefreshToken(user.getId().toString(), user.getUserRole()))
                 .build();
     }
 
@@ -71,27 +76,43 @@ public class JwtProvider implements AuthenticationProvider {
     }
 
     @Override
-    public String createRefreshToken() {
+    public String createRefreshToken(String userId, UserRole userRole) {
+        String jti = UUID.randomUUID().toString();
+
+        Claims claims = Jwts.claims();
+        claims.put("userId", userId);
+        claims.put("userRole", userRole);
+
+        tokenService.storeRefreshTokenJti(userId, jti);
+
         return Jwts
                 .builder()
+                .setSubject(REFRESH_TOKEN_SUBJECT)
+                .setClaims(claims)
+                .setId(jti)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidityInSeconds * 1000))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
-    @Override
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            throw new RuntimeException("TOKEN EXPIRED");
-        } catch (JwtException e) {
-            throw new RuntimeException("TOKEN INVALID");
-        }
+    public String refreshRefreshToken(String userId, UserRole userRole) {
+        String jti = UUID.randomUUID().toString();
+        Claims claims = Jwts.claims();
+        claims.put("userId", userId);
+        claims.put("userRole", userRole);
+
+        tokenService.resetRefreshTokenJti(userId, jti);
+
+        return Jwts
+                .builder()
+                .setSubject(REFRESH_TOKEN_SUBJECT)
+                .setClaims(claims)
+                .setId(jti)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidityInSeconds * 1000))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     public Jws<Claims> validateAccessToken(String token) {
@@ -100,10 +121,47 @@ public class JwtProvider implements AuthenticationProvider {
                     .setSigningKey(secret)
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("TOKEN EXPIRED");
+            throw new TokenExpiredException();
         } catch (JwtException e) {
-            throw new RuntimeException("TOKEN INVALID");
+            throw new InvalidTokenException();
         }
+    }
+
+    public Jws<Claims> validateRefreshToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException();
+        } catch (JwtException e) {
+            throw new InvalidTokenException();
+        }
+    }
+
+    public JwtToken reissue(String refreshToken) {
+        String userId = getUserIdFromToken(refreshToken);
+
+        User user = userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(UserNotFoundException::new);
+
+        return JwtToken.builder()
+                .accessToken(createAccessToken(user.getId().toString(), user.getUserRole()))
+                .refreshToken(refreshRefreshToken(user.getId().toString(), user.getUserRole()))
+                .build();
+    }
+
+    public String getUserIdFromToken(String token) {
+        Jws<Claims> claims = validateRefreshToken(token);
+
+        String jti = claims.getBody().getId();
+        String userId = claims.getBody().get("userId", String.class);
+
+        if (!tokenService.isRefreshTokenValid(userId, jti)){
+            throw new InvalidTokenException();
+        }
+
+        return userId;
     }
 
     public String getAccessTokenFromHeader(HttpServletRequest request) {
