@@ -5,6 +5,8 @@ import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.IdDupValidResponse;
 import com.mgbell.user.model.dto.response.LoginResponse;
+import com.mgbell.user.model.dto.response.ReissueResponse;
+import com.mgbell.user.model.dto.response.UserInfoResponse;
 import com.mgbell.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,12 @@ public class UserController {
     @Operation(summary = "로그인")
     public ResponseEntity<LoginResponse> login(@RequestBody @Validated LoginRequest request) {
         return ResponseEntity.ok(userService.login(request));
+    }
+
+    @PostMapping(path = "/reissue")
+    @Operation(summary = "토큰 재발급")
+    public ResponseEntity<ReissueResponse> reissue(@RequestBody @Validated ReissueRequest request) {
+        return ResponseEntity.ok(userService.reissue(request));
     }
 
     @AllUserAuth
