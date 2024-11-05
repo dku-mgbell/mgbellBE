@@ -1,7 +1,5 @@
 package com.mgbell.global.s3.service;
 
-import com.mgbell.global.s3.exception.FailedToLoadImage;
-import com.mgbell.global.s3.exception.ImageNotFound;
 import com.mgbell.global.s3.exception.OnlyJpegOrPngIsAvailable;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
@@ -16,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +37,6 @@ public class S3Service {
             s3Operations.upload(bucket, fileDir, is,
                     ObjectMetadata.builder().contentType(image.getContentType()).build());
 
-//            s3Operations.store(bucket, fileDir, convertToThumbnail(image, fileDir));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
