@@ -1,7 +1,10 @@
 package com.mgbell.favorite.exception;
 
-public class FavoriteNotExist extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class FavoriteNotExist extends CustomException {
     public FavoriteNotExist() {
-        super("FAVORITE NOT EXIST");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "FAVORITE_NOT_EXIST");
     }
 }

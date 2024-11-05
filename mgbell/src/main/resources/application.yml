@@ -37,6 +37,8 @@ spring:
         static: ${s3.region}
       stack:
         auto: false
+  messages:
+    basename: messages
 
 jwt:
   secret: ${jwt.secrets}

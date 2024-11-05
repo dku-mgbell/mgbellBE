@@ -1,8 +1,10 @@
 package com.mgbell.user.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class UserNotFoundException extends CustomException {
     public UserNotFoundException() {
-        super("USER_NOT_FOUND");
-        // Todo 커스텀 에러 메시지
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "USER_NOT_FOUND");
     }
 }

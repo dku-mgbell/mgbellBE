@@ -8,6 +8,8 @@ import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.LoginResponse;
 import com.mgbell.store.model.entity.Store;
+import com.mgbell.user.model.dto.response.ReissueResponse;
+import com.mgbell.user.model.dto.response.UserInfoResponse;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.repository.TokenRedisRepository;
@@ -57,6 +59,15 @@ public class UserService {
         }
     }
 
+    public ReissueResponse reissue(ReissueRequest request) {
+        JwtToken token = jwtProvider.reissue(request.getRefreshToken());
+
+        return new ReissueResponse(
+                token.getAccessToken(),
+                token.getRefreshToken()
+        );
+    }
+
     public boolean isDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
@@ -104,5 +115,16 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+
+    public UserInfoResponse whoAmI(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        return new UserInfoResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 }

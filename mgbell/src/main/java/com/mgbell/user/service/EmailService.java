@@ -1,6 +1,7 @@
 package com.mgbell.user.service;
 
 import com.mgbell.global.nhn.service.NhnService;
+import com.mgbell.user.exception.IncorrectEmailCode;
 import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.model.dto.response.TokenValidationResponse;
 import com.mgbell.user.repository.TokenRedisRepository;
@@ -34,6 +35,12 @@ public class EmailService {
     }
 
     public TokenValidationResponse validateToken(String email, String validToken) {
+        boolean isValid = tokenRedisRepository.getToken(email).equals(validToken);
+
+        if(!isValid){
+            log.info("error");
+            throw new IncorrectEmailCode();
+        }
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
         return TokenValidationResponse.builder()

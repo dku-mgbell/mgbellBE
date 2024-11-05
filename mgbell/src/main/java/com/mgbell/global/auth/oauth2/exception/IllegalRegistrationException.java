@@ -1,7 +1,10 @@
 package com.mgbell.global.auth.oauth2.exception;
 
-public class IllegalRegistrationException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class IllegalRegistrationException extends CustomException {
     public IllegalRegistrationException() {
-        super("ILLEGAL REGISTRATION");
+        super(HttpStatus.BAD_REQUEST, "ILLEGAL_REGISTRATION");
     }
 }

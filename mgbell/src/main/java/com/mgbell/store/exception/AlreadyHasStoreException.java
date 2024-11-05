@@ -1,7 +1,10 @@
 package com.mgbell.store.exception;
 
-public class AlreadyHasStoreException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class AlreadyHasStoreException extends CustomException {
   public AlreadyHasStoreException() {
-    super("ALREADY HAS STORE");
+    super(HttpStatus.INTERNAL_SERVER_ERROR, "ALREADY_HAS_STORE");
   }
 }
