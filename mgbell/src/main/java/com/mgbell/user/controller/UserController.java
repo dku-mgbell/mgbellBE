@@ -69,4 +69,10 @@ public class UserController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @AllUserAuth
+    @GetMapping(path = "/whoAmI")
+    public ResponseEntity<UserInfoResponse> whoAmI(JwtAuthentication auth) {
+        return ResponseEntity.ok(userService.whoAmI(auth.getUserId()));
+    }
 }

@@ -116,4 +116,15 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
+
+    public UserInfoResponse whoAmI(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        return new UserInfoResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
 }
