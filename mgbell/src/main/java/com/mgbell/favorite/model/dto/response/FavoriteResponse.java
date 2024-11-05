@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavoriteResponse {
-    private Long postId;
+    private Long id; //판매글 id
     private String storeName;
     private String bagName;
     private boolean onSale;
