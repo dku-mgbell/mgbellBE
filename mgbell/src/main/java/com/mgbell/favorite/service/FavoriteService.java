@@ -64,16 +64,6 @@ public class FavoriteService {
         return favorites.map(currFavorite -> {
             Store store = currFavorite.getStore();
             Post post = store.getPost();
-//            List<PostFileResponse> files = currPost.getFiles().stream()
-//                    .map(file -> {
-//                        String url = fileUploadService.getFileUrl(file.getFileId());
-//                        return new PostFileResponse(file, url);
-//                    }).collect(Collectors.toList());
-            //            List<PostFileResponse> files = currPost.getFiles().stream()
-//                    .map(file -> {
-//                        String url = fileUploadService.getFileUrl(file.getFileId());
-//                        return new PostFileResponse(file, url);
-//                    }).collect(Collectors.toList());
 
             return new FavoriteResponse(
                     store.getPost().getPostId(),

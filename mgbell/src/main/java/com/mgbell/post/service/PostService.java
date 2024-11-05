@@ -172,6 +172,7 @@ public class PostService {
                     store.getStoreName(),
                     currPost.getBagName(),
                     favorite,
+                    store.getReviews().size(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),

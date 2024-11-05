@@ -14,6 +14,7 @@ public class PostPreviewResponse {
     private String storeName;
     private String bagName;
     private boolean favorite;
+    private int reviewCnt;
     private boolean onSale;
     private String startAt;
     private String endAt;
