@@ -1,7 +1,10 @@
 package com.mgbell.order.exception;
 
-public class OrderNotFoundException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class OrderNotFoundException extends CustomException {
     public OrderNotFoundException() {
-        super("ORDER NOT FOUND");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "ORDER_NOT_FOUND");
     }
 }

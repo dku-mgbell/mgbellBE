@@ -1,7 +1,10 @@
 package com.mgbell.user.exception;
 
-public class UserHasNoStoreException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class UserHasNoStoreException extends CustomException {
     public UserHasNoStoreException() {
-        super("HAS NO STORE");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "HAS_NO_STORE");
     }
 }

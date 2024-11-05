@@ -1,7 +1,10 @@
 package com.mgbell.order.exception;
 
-public class AmountIsTooBigException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class AmountIsTooBigException extends CustomException {
     public AmountIsTooBigException() {
-        super("AMOUNT IS TOO BIG");
+        super(HttpStatus.BAD_REQUEST, "AMOUNT_IS_TOO_BIG");
     }
 }

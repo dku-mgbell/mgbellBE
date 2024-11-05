@@ -1,7 +1,10 @@
 package com.mgbell.review.exception;
 
-public class ReviewNotFoundException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class ReviewNotFoundException extends CustomException {
     public ReviewNotFoundException() {
-        super("REVIEW NOT FOUND");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "REVIEW_NOT_FOUND");
     }
 }

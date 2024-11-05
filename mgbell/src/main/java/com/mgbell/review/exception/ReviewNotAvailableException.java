@@ -1,7 +1,10 @@
 package com.mgbell.review.exception;
 
-public class ReviewNotAvailableException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class ReviewNotAvailableException extends CustomException {
     public ReviewNotAvailableException() {
-        super("REVIEW NOT AVAILABLE");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "REVIEW_NOT_AVAILABLE");
     }
 }
