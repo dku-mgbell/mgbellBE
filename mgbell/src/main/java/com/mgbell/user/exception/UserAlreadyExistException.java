@@ -1,7 +1,10 @@
 package com.mgbell.user.exception;
 
-public class UserAlreadyExistException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class UserAlreadyExistException extends CustomException {
     public UserAlreadyExistException() {
-        super("USER ALREADY EXISTS");
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "USER_ALREADY_EXISTS");
     }
 }

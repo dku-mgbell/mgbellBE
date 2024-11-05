@@ -1,7 +1,10 @@
 package com.mgbell.user.exception;
 
-public class UserHasNoAuthorityException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class UserHasNoAuthorityException extends CustomException {
     public UserHasNoAuthorityException() {
-        super("USER HAS NO AUTHORITY");
+        super(HttpStatus.UNAUTHORIZED, "USER_HAS_NO_AUTHORITY");
     }
 }

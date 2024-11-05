@@ -1,7 +1,10 @@
 package com.mgbell.review.exception;
 
-public class EditNotAvailableException extends RuntimeException {
+import com.mgbell.global.error.model.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class EditNotAvailableException extends CustomException {
   public EditNotAvailableException() {
-    super("EDIT NOT AVAILABLE");
+    super(HttpStatus.INTERNAL_SERVER_ERROR, "EDIT_NOT_AVAILABLE");
   }
 }
