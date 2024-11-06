@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostResponse {
+    private Long postId;
     private Long storeId;
     private String storeName;
     private String bagName;

@@ -2,6 +2,7 @@ package com.mgbell.review.model.entity;
 
 import com.mgbell.global.util.BaseEntity;
 import com.mgbell.global.util.SatisfiedReasonListConverter;
+import com.mgbell.order.model.entity.Order;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
@@ -48,13 +49,18 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
     public Review(String content, ReviewScore reviewScore,
-                  List<SatisfiedReason> satisfiedReasons, User user, Store store) {
+                  List<SatisfiedReason> satisfiedReasons, User user, Store store, Order order) {
         this.content = content;
         this.reviewScore = reviewScore;
         this.satisfiedReasons = satisfiedReasons;
         this.user = user;
         this.store = store;
+        this.order = order;
     }
 
     public void updateReview(String content, ReviewScore reviewScore,
