@@ -12,6 +12,7 @@ import com.mgbell.order.repository.OrderRepository;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
+import com.mgbell.review.repository.ReviewRepository;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.store.repository.StoreRepository;
@@ -39,6 +40,7 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final ReviewRepository reviewRepository;
     @Value("${s3.link}")
     private String s3url;
 
@@ -173,6 +175,7 @@ public class OrderService {
                 store.getStoreName(),
                 store.getPost().getBagName(),
                 order.getState(),
+                reviewRepository.existsByOrderId(orderId),
                 order.getCreatedAt(),
                 store.getAddress(),
                 order.getPayment(),
@@ -238,6 +241,7 @@ public class OrderService {
                     currOrder.getStore().getStoreName(),
                     currOrder.getStore().getPost().getBagName(),
                     currOrder.getState(),
+                    reviewRepository.existsByOrderId(currOrder.getId()),
                     currOrder.getAmount(),
                     currOrder.getSubtotal(),
             s3url + URLEncoder.encode(currOrder.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
