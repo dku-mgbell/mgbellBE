@@ -233,6 +233,7 @@ public class OrderService {
                 new UserOrderPreviewResponse(
                     currOrder.getId(),
                     currOrder.getStore().getPost().getPostId(),
+                    currOrder.getStore().getId(),
                     currOrder.getCreatedAt(),
                     currOrder.getStore().getStoreName(),
                     currOrder.getStore().getPost().getBagName(),
