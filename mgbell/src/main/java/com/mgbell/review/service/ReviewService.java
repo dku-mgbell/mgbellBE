@@ -9,6 +9,7 @@ import com.mgbell.review.exception.EditNotAvailableException;
 import com.mgbell.review.exception.ReviewNotAvailableException;
 import com.mgbell.review.exception.ReviewNotFoundException;
 import com.mgbell.review.model.dto.request.OwnerCommentRequest;
+import com.mgbell.review.model.dto.request.UserReviewEditRequest;
 import com.mgbell.review.model.dto.request.UserReviewRequest;
 import com.mgbell.review.model.dto.response.OwnerReviewResponse;
 import com.mgbell.review.model.dto.response.ReviewResponse;
@@ -60,14 +61,14 @@ public class ReviewService {
     public void userReivew(UserReviewRequest request, List<MultipartFile> requestImages, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Store store = storeRepository.findById(request.getStoreId())
-                .orElseThrow(StoreNotFoundException::new);
-        Order order = orderRepository.findByStoreIdAndUserId(store.getId(), user.getId())
+        Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(OrderNotFoundException::new);
 
-        if(!user.getUserRole().isUser()) throw new UserHasNoAuthorityException();
+        if(!user.getUserRole().isUser() || order.getUser() != user) throw new UserHasNoAuthorityException();
 
-        if(order.getState() != OrderState.COMPLETED || order.getUpdatedAt().isAfter(LocalDateTime.now().minusMinutes(10))) {
+        if(order.getState() != OrderState.COMPLETED
+//                || order.getUpdatedAt().isAfter(LocalDateTime.now().minusMinutes(10))
+        ) {
             throw new ReviewNotAvailableException();
         }
 
@@ -76,9 +77,11 @@ public class ReviewService {
                 request.getReviewScore(),
                 request.getSatisfiedReasons(),
                 user,
-                store);
+                order.getStore(),
+                order
+                );
 
-        increaseReviewScore(store, request.getReviewScore());
+        increaseReviewScore(order.getStore(), request.getReviewScore());
 
         if(requestImages != null)
             saveImages(review, requestImages);
@@ -88,16 +91,16 @@ public class ReviewService {
 
 
     @Transactional
-    public void userEditReivew(UserReviewRequest request, List<MultipartFile> file, Long userId) {
+    public void userEditReivew(UserReviewEditRequest request, List<MultipartFile> file, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Store store = storeRepository.findById(request.getStoreId())
-                .orElseThrow(StoreNotFoundException::new);
 
         if(!user.getUserRole().isUser()) throw new UserHasNoAuthorityException();
 
-        Review review = reviewRepository.findByUserIdAndStoreId(user.getId(), store.getId())
+        Review review = reviewRepository.findById(request.getReviewId())
                 .orElseThrow(EditNotAvailableException::new);
+
+        Store store = review.getStore();
 
         if(LocalDateTime.now().isAfter(review.getCreatedAt().plusDays(3))) {
             throw new ReviewNotAvailableException();
@@ -178,7 +181,6 @@ public class ReviewService {
 
     public Page<UserReviewResponse> getUserReviewPage(Page<Review> reviews) {
         return reviews.map(currReview -> {
-//            List<String> images = currReview.getImages().stream().map(ReviewImage::getOriginalFileDir).toList();
             List<String> images = currReview.getImages().stream()
                     .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
@@ -202,6 +204,19 @@ public class ReviewService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
+        ReviewScore mostReviewScore = getMostReviewScore(store);
+
+        return new StoreReviewPreviewResponse(
+                mostReviewScore,
+                store.getBest(),
+                store.getGood(),
+                store.getNotGood(),
+                store.getNotBad(),
+                store.getReviews().size()
+        );
+    }
+
+    private static ReviewScore getMostReviewScore(Store store) {
         List<Integer> reviewScoreCnts = new ArrayList<>();
         reviewScoreCnts.add(store.getBest());
         reviewScoreCnts.add(store.getGood());
@@ -210,21 +225,13 @@ public class ReviewService {
 
         int maxReviewScore = Collections.max(reviewScoreCnts);
 
-        ReviewScore reviewScore = switch (reviewScoreCnts.indexOf(maxReviewScore)) {
-            case 1 -> ReviewScore.GOOD;
-            case 2 -> ReviewScore.NOTGOOD;
-            case 3 -> ReviewScore.NOTBAD;
-            default -> ReviewScore.BEST;
-        };
-
-        return new StoreReviewPreviewResponse(
-                reviewScore,
-                store.getBest(),
-                store.getGood(),
-                store.getNotGood(),
-                store.getNotBad(),
-                store.getReviews().size()
-        );
+        return
+                switch (reviewScoreCnts.indexOf(maxReviewScore)) {
+                    case 1 -> ReviewScore.GOOD;
+                    case 2 -> ReviewScore.NOTGOOD;
+                    case 3 -> ReviewScore.NOTBAD;
+                    default -> ReviewScore.BEST;
+                };
     }
 
     public Page<ReviewResponse> getReviewList(Pageable pageable, Long storeId, Long userId) {

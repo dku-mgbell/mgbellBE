@@ -13,9 +13,9 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserReviewRequest {
-    @NotNull(message = "order id error")
-    private Long orderId;
+public class UserReviewEditRequest {
+    @NotNull(message = "review id error")
+    private Long reviewId;
     @NotNull(message = "review score error")
     private ReviewScore reviewScore;
     private String content;

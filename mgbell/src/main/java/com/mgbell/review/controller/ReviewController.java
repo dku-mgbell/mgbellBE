@@ -4,6 +4,7 @@ import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.review.model.dto.request.OwnerCommentRequest;
+import com.mgbell.review.model.dto.request.UserReviewEditRequest;
 import com.mgbell.review.model.dto.request.UserReviewRequest;
 import com.mgbell.review.model.dto.response.OwnerReviewResponse;
 import com.mgbell.review.model.dto.response.ReviewResponse;
@@ -47,7 +48,7 @@ public class ReviewController {
     @UserAuth
     @PatchMapping(path = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "일반 사용자 API: 리뷰 수정하기")
-    public void userEditReview(@RequestPart @Validated UserReviewRequest request,
+    public void userEditReview(@RequestPart @Validated UserReviewEditRequest request,
                                @RequestPart(required = false) List<MultipartFile> file,
                                JwtAuthentication auth) {
         reviewService.userEditReivew(request, file, auth.getUserId());
