@@ -19,6 +19,7 @@ public class UserOrderResponse {
     private String storeName;
     private String bagName;
     private OrderState orderState;
+    private boolean reviewed;
     private LocalDateTime orderDateTime;
     private String address;
     private Payment payment;

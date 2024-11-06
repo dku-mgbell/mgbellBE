@@ -19,6 +19,7 @@ public class UserOrderPreviewResponse {
     private String storeName;
     private String bagName;
     private OrderState orderState;
+    private boolean reviewed;
     private int amount;
     private int subTotal;
     private String images;
