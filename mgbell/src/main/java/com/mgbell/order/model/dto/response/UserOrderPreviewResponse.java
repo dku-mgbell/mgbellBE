@@ -14,6 +14,7 @@ import java.util.List;
 public class UserOrderPreviewResponse {
     private Long orderId;
     private Long postId;
+    private Long storeId;
     private LocalDateTime orderDateTime;
     private String storeName;
     private String bagName;
