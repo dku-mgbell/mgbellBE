@@ -14,7 +14,7 @@ public class OwnerReviewResponse {
     private Long reviewId;
     private String userName;
     private String content;
-    private String ownerCommnet;
+    private String ownerComment;
     private List<SatisfiedReason> satisfiedReasons;
     private List<String> images;
 }

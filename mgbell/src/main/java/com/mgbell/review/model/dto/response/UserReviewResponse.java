@@ -20,7 +20,7 @@ public class UserReviewResponse {
     private String storeName;
     private ReviewScore reviewScore;
     private String content;
-    private String ownerComent;
+    private String ownerComment;
     private List<SatisfiedReason> satisfiedReasons = new ArrayList<>();
     private List<String> images = new ArrayList<>();
 }

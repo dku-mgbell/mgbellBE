@@ -15,10 +15,13 @@ import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -28,6 +31,9 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+
+    @Value("${s3.url}")
+    private String s3url;
 
     @Transactional
     public void favoriteUpdate(FavoriteRequest request, Long userId) {
@@ -77,7 +83,9 @@ public class FavoriteService {
                     store.getLatitude(),
                     post.getCostPrice(),
                     post.getSalePrice(),
-                    post.getAmount());
+                    post.getAmount(),
+                    s3url + URLEncoder.encode(store.getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
+            );
         });
     }
 }
