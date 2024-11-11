@@ -3,6 +3,7 @@ package com.mgbell.order.service;
 import com.mgbell.order.exception.AmountIsTooBigException;
 import com.mgbell.order.exception.OrderCompleteNotAvailableException;
 import com.mgbell.order.exception.OrderNotFoundException;
+import com.mgbell.order.exception.PickupTimeOutOfRange;
 import com.mgbell.order.model.dto.request.OwnerOrderCancleRequest;
 import com.mgbell.order.model.dto.request.UserOrderRequest;
 import com.mgbell.order.model.dto.response.*;
@@ -52,6 +53,11 @@ public class OrderService {
                 .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findByStore(store)
                 .orElseThrow(PostNotFoundException::new);
+
+        if(userOrderRequest.getPickupTime().isBefore(store.getPost().getStartAt()) ||
+                userOrderRequest.getPickupTime().isAfter(store.getPost().getEndAt())) {
+            throw new PickupTimeOutOfRange();
+        }
 
         int leftAmount = post.getAmount() - userOrderRequest.getAmount();
         if(leftAmount < 0) {
@@ -106,15 +112,15 @@ public class OrderService {
             throw new UserHasNoAuthorityException();
         }
 
-        Post post = order.getStore().getPost();
+//        Post post = order.getStore().getPost();
         User user = order.getUser();
+//
+//        int cnt = order.getAmount();
+//        int totalAmount = post.getSalePrice() * cnt;
+//        float carbonReduction = ((float) post.getSalePrice() / 5900) * 2;
+//        int discount = (post.getCostPrice() * cnt) - totalAmount;
 
-        int cnt = order.getAmount();
-        int totalAmount = post.getSalePrice() * cnt;
-        int carbonReduction = (post.getSalePrice() / 5900) * 2;
-        int discount = (post.getCostPrice() * cnt) - totalAmount;
-
-        user.userOrderUpdate(1, carbonReduction, discount);
+//        user.userOrderUpdate(1, carbonReduction, discount);
 
         order.updateOrder(OrderState.ACCEPTED);
     }
@@ -129,7 +135,7 @@ public class OrderService {
         }
 
         order.updateOrder(OrderState.OWNER_REFUSED);
-        order.updateCancleReason(request.getCancleReason());
+        order.updateCancelReason(request.getCancleReason());
         Post post = order.getStore().getPost();
 
         int leftAmount = post.getAmount() + order.getAmount();
@@ -138,7 +144,7 @@ public class OrderService {
 
         return new OrderRefuseResultResponse(
                 order.getState(),
-                order.getCancleReason().getReason()
+                order.getCancelReason().getReason()
         );
     }
 
@@ -154,6 +160,16 @@ public class OrderService {
         if(order.getState() != OrderState.ACCEPTED) {
             throw new OrderCompleteNotAvailableException();
         }
+
+        Post post = order.getStore().getPost();
+        User user = order.getUser();
+
+        int cnt = order.getAmount();
+        int totalAmount = post.getSalePrice() * cnt;
+        float carbonReduction = ((float) post.getSalePrice() / 5900) * 2;
+        int discount = (post.getCostPrice() * cnt) - totalAmount;
+
+        user.userOrderUpdate(1, carbonReduction, discount);
 
         order.updateOrder(OrderState.COMPLETED);
     }
@@ -183,7 +199,7 @@ public class OrderService {
                 order.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                 order.getSubtotal(),
                 order.getRequest(),
-                order.getCancleReason(),
+                order.getCancelReason(),
         s3url + URLEncoder.encode(order.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
         );
     }
@@ -203,13 +219,14 @@ public class OrderService {
                 order.getId(),
                 store.getStoreName(),
                 order.getState(),
-                order.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                order.getCreatedAt(),
                 order.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                 order.getRequest(),
+                order.getUser().getPhoneNumber(),
                 order.getAmount(),
                 order.getSubtotal(),
                 order.getPayment(),
-                order.getCancleReason()
+                order.getCancelReason()
         );
     }
 
@@ -253,9 +270,11 @@ public class OrderService {
                 new OwnerOrderPreviewResponse(
                         currOrder.getId(),
                         currOrder.getState(),
-                        currOrder.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        currOrder.getCancelReason(),
+                        currOrder.getCreatedAt(),
                         currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                         currOrder.getRequest(),
+                        currOrder.getUser().getPhoneNumber(),
                         currOrder.getAmount(),
                         currOrder.getSubtotal(),
                         currOrder.getPayment()

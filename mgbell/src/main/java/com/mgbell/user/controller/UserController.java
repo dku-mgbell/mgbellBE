@@ -2,11 +2,9 @@ package com.mgbell.user.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.AllUserAuth;
+import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.user.model.dto.request.*;
-import com.mgbell.user.model.dto.response.IdDupValidResponse;
-import com.mgbell.user.model.dto.response.LoginResponse;
-import com.mgbell.user.model.dto.response.ReissueResponse;
-import com.mgbell.user.model.dto.response.UserInfoResponse;
+import com.mgbell.user.model.dto.response.*;
 import com.mgbell.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +72,11 @@ public class UserController {
     @GetMapping(path = "/whoAmI")
     public ResponseEntity<UserInfoResponse> whoAmI(JwtAuthentication auth) {
         return ResponseEntity.ok(userService.whoAmI(auth.getUserId()));
+    }
+
+    @UserAuth
+    @GetMapping(path = "/myPage")
+    public ResponseEntity<MyPageResponse> myPage(JwtAuthentication auth) {
+        return ResponseEntity.ok(userService.myPage(auth.getUserId()));
     }
 }

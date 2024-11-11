@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,6 +16,7 @@ public class OwnerReviewResponse {
     private String userName;
     private String content;
     private String ownerComment;
+    private LocalDateTime ownerCommentDate;
     private List<SatisfiedReason> satisfiedReasons;
     private List<String> images;
 }

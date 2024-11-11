@@ -17,7 +17,8 @@ public class ReviewResponse {
     private LocalDateTime createdAt;
     private ReviewScore reviewScore;
     private String content;
-    private List<SatisfiedReason> reasons;
+    private List<SatisfiedReason> satisfiedReasons;
     private List<String> images;
-    private String ownercomment;
+    private String ownerComment;
+    private LocalDateTime ownerCommentDate;
 }

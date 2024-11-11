@@ -1,5 +1,6 @@
 package com.mgbell.global.auth.oauth2;
 
+import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.UserRepository;
@@ -52,7 +53,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
                     .orElseThrow(UserNotFoundException::new);
 
-            isNewUser = user.getPhoneNumber().isEmpty();
+            if(user.getPhoneNumber().isEmpty()){
+                isNewUser = true;
+            } else {
+                throw new UserAlreadyExistException();
+            }
         } else {
             isNewUser = true;
             user = userRepository.save(oAuth2UserInfo.toEntity());

@@ -62,6 +62,7 @@ public class PostService {
                 .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostResponse.builder()
+                .id(postId)
                 .storeId(store.getId())
                 .storeName(store.getStoreName())
                 .bagName(post.getBagName())

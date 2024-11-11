@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class PostPreviewRequest {
     private StoreType storeType;
     private Boolean onSale;
+    private String storeName;
 }

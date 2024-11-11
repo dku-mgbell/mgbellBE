@@ -36,11 +36,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private int orderCnt;
-    private int carbonReduction;
+    private float carbonReduction;
     private int totalDiscount;
 
     @Setter
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Store store;
 
     @Setter
@@ -51,7 +51,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> review = new ArrayList<>();
 
-    public void userOrderUpdate(int orderCnt, int carbonReduction, int totalDiscount) {
+    public void userOrderUpdate(int orderCnt, float carbonReduction, int totalDiscount) {
         this.orderCnt += orderCnt;
         this.carbonReduction += carbonReduction;
         this.totalDiscount += totalDiscount;
