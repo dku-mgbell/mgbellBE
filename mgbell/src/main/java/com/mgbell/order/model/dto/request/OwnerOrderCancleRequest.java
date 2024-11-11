@@ -1,6 +1,6 @@
 package com.mgbell.order.model.dto.request;
 
-import com.mgbell.order.model.entity.CancleReason;
+import com.mgbell.order.model.entity.CancelReason;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OwnerOrderCancleRequest {
-    private CancleReason cancleReason;
+    private CancelReason cancleReason;
 }

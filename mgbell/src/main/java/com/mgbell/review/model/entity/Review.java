@@ -7,10 +7,7 @@ import com.mgbell.store.model.entity.Store;
 import com.mgbell.user.model.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,6 +38,7 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReviewImage> images = new ArrayList<>();
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -49,6 +47,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @Setter
     @OneToOne
     @JoinColumn(name = "order_id")
     private Order order;

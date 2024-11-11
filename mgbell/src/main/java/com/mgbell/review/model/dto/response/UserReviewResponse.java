@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserReviewResponse {
+    private Long id;
     private Long storeId;
     private Long reviewId;
     private LocalDateTime createdAt;
@@ -21,6 +22,7 @@ public class UserReviewResponse {
     private ReviewScore reviewScore;
     private String content;
     private String ownerComment;
+    private LocalDateTime ownerCommentDate;
     private List<SatisfiedReason> satisfiedReasons = new ArrayList<>();
     private List<String> images = new ArrayList<>();
 }

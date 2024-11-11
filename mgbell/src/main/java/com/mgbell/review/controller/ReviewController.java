@@ -55,10 +55,10 @@ public class ReviewController {
     }
 
     @UserAuth
-    @DeleteMapping("/user/{storeId}")
+    @DeleteMapping("/user/{reviewId}")
     @Operation(summary = "일반 사용자 API: 리뷰 삭제하기")
-    public void userDeleteReview(@PathVariable Long storeId, JwtAuthentication auth) {
-        reviewService.userDeleteReivew(storeId, auth.getUserId());
+    public void userDeleteReview(@PathVariable Long reviewId, JwtAuthentication auth) {
+        reviewService.userDeleteReivew(reviewId, auth.getUserId());
     }
 
     @OwnerAuth
@@ -76,7 +76,7 @@ public class ReviewController {
     }
 
     @UserAuth
-    @GetMapping("/Preview/{storeId}")
+    @GetMapping("/preview/{storeId}")
     @Operation(summary = "일반 사용자 API: 가게 리뷰 통계 확인하기")
     public ResponseEntity<StoreReviewPreviewResponse> getReviewPreview(@PathVariable Long storeId, JwtAuthentication auth) {
         return ResponseEntity.ok(reviewService.getReviewPreview(storeId, auth.getUserId()));

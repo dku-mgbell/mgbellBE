@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByUserId(Pageable pageable, Long userId);
     Page<Review> findByStoreId(Pageable pageable, Long storeId);
-    Optional<Review> findByUserIdAndStoreId(Long userId, Long storeId);
+    Optional<Review> findByIdAndUserId(Long reviewId, Long userId);
     boolean existsByOrderId(Long orderId);
 }

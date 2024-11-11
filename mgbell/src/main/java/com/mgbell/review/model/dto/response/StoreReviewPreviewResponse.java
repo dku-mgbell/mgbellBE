@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StoreReviewPreviewResponse {
     private ReviewScore mostReviewScore;
-    private int best;
-    private int good;
-    private int notGood;
-    private int notBad;
-    private int reviewCount;
+    private ReviewCountsResponse reviewCounts;
+    private int totalReviewCount;
 }

@@ -1,6 +1,6 @@
 package com.mgbell.order.model.dto.response;
 
-import com.mgbell.order.model.entity.CancleReason;
+import com.mgbell.order.model.entity.CancelReason;
 import com.mgbell.order.model.entity.OrderState;
 import com.mgbell.order.model.entity.Payment;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,6 @@ public class UserOrderResponse {
     private String pickupTime;
     private int subTotal;
     private String request;
-    private CancleReason cancelReason;
+    private CancelReason cancelReason;
     private String images;
 }

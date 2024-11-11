@@ -35,7 +35,8 @@ public class PostRepositoryCustom {
                         .from(post)
                         .where(
                                 onSaleEq(request.getOnSale()),
-                                storeEq(request.getStoreType())
+                                storeEq(request.getStoreType()),
+                                storeNameEq(request.getStoreName())
                         )
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
@@ -45,8 +46,11 @@ public class PostRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(post.count())
                 .from(post)
-                .where(onSaleEq(request.getOnSale()),
-                        storeEq(request.getStoreType()));
+                .where(
+                        onSaleEq(request.getOnSale()),
+                        storeEq(request.getStoreType()),
+                        storeEq(request.getStoreType())
+                );
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -57,6 +61,10 @@ public class PostRepositoryCustom {
 
     private BooleanExpression storeEq(StoreType storeType) {
         return storeType != null ? store.storeType.eq(storeType) : null;
+    }
+
+    private BooleanExpression storeNameEq(String storeName) {
+        return storeName != null ? store.storeName.contains(storeName) : null;
     }
 
     public static <T> OrderSpecifier<?>[] getSort(Pageable pageable, EntityPathBase<T> qClass) {

@@ -11,10 +11,7 @@ import com.mgbell.review.exception.ReviewNotFoundException;
 import com.mgbell.review.model.dto.request.OwnerCommentRequest;
 import com.mgbell.review.model.dto.request.UserReviewEditRequest;
 import com.mgbell.review.model.dto.request.UserReviewRequest;
-import com.mgbell.review.model.dto.response.OwnerReviewResponse;
-import com.mgbell.review.model.dto.response.ReviewResponse;
-import com.mgbell.review.model.dto.response.StoreReviewPreviewResponse;
-import com.mgbell.review.model.dto.response.UserReviewResponse;
+import com.mgbell.review.model.dto.response.*;
 import com.mgbell.review.model.entity.Review;
 import com.mgbell.review.model.entity.ReviewImage;
 import com.mgbell.review.model.entity.ReviewScore;
@@ -63,6 +60,7 @@ public class ReviewService {
                 .orElseThrow(UserNotFoundException::new);
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(OrderNotFoundException::new);
+        Store store = order.getStore();
 
         if(!user.getUserRole().isUser() || order.getUser() != user) throw new UserHasNoAuthorityException();
 
@@ -81,6 +79,7 @@ public class ReviewService {
                 order
                 );
 
+        store.getReviews().add(review);
         increaseReviewScore(order.getStore(), request.getReviewScore());
 
         if(requestImages != null)
@@ -120,17 +119,16 @@ public class ReviewService {
     }
 
     @Transactional
-    public void userDeleteReivew(Long storeId, Long userId) {
+    public void userDeleteReivew(Long reviewId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(StoreNotFoundException::new);
 
         if(!user.getUserRole().isUser()) throw new UserHasNoAuthorityException();
 
-        Review review = reviewRepository.findByUserIdAndStoreId(user.getId(), store.getId())
+        Review review = reviewRepository.findByIdAndUserId(reviewId, userId)
                 .orElseThrow(ReviewNotFoundException::new);
 
+        decreaseReviewScore(review.getStore(), review.getReviewScore());
         reviewRepository.delete(review);
     }
 
@@ -164,6 +162,7 @@ public class ReviewService {
                     currReview.getUser().getName(),
                     currReview.getContent(),
                     currReview.getOwnerComent(),
+                    currReview.getOwnerCommentDate(),
                     currReview.getSatisfiedReasons(),
                     images
             );
@@ -184,14 +183,18 @@ public class ReviewService {
             List<String> images = currReview.getImages().stream()
                     .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
+            Store store = currReview.getStore();
+
             return new UserReviewResponse(
-                    currReview.getStore().getId(),
+                    store.getPost().getPostId(),
+                    store.getId(),
                     currReview.getId(),
                     currReview.getCreatedAt(),
-                    currReview.getStore().getStoreName(),
+                    store.getStoreName(),
                     currReview.getReviewScore(),
                     currReview.getContent(),
                     currReview.getOwnerComent(),
+                    currReview.getOwnerCommentDate(),
                     currReview.getSatisfiedReasons(),
                     images
             );
@@ -208,10 +211,12 @@ public class ReviewService {
 
         return new StoreReviewPreviewResponse(
                 mostReviewScore,
-                store.getBest(),
-                store.getGood(),
-                store.getNotGood(),
-                store.getNotBad(),
+                new ReviewCountsResponse(
+                        store.getBest(),
+                        store.getGood(),
+                        store.getNotGood(),
+                        store.getNotBad()
+                ),
                 store.getReviews().size()
         );
     }
@@ -255,7 +260,8 @@ public class ReviewService {
                         currReview.getSatisfiedReasons(),
                         currReview.getImages().stream().map(currImage ->
                                 s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList(),
-                        currReview.getOwnerComent()
+                        currReview.getOwnerComent(),
+                        currReview.getOwnerCommentDate()
                 ));
     }
 
