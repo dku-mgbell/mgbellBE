@@ -3,10 +3,7 @@ package com.mgbell.post.service;
 import com.mgbell.favorite.repository.FavoriteRepository;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
-import com.mgbell.post.model.dto.response.PostForGuestResponse;
-import com.mgbell.post.model.dto.response.PostPreviewForGuestResponse;
-import com.mgbell.post.model.dto.response.PostPreviewResponse;
-import com.mgbell.post.model.dto.response.PostResponse;
+import com.mgbell.post.model.dto.response.*;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
@@ -57,6 +54,34 @@ public class PostService {
         Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
         return getPostResponsesForGuest(posts);
+    }
+
+    public MyPostResponse getMyPost(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        Store store = user.getStore();
+        Post post = store.getPost();
+
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+
+        return new MyPostResponse(
+                post.getPostId(),
+                store.getStoreName(),
+                post.getBagName(),
+                post.getDescription(),
+                store.getReviews().size(),
+                store.getAddress(),
+                store.getLongitude(),
+                store.getLatitude(),
+                post.isOnSale(),
+                post.getAmount(),
+                post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                post.getCostPrice(),
+                post.getSalePrice(),
+                images
+        );
     }
 
     public void create(PostCreateRequest request, Long id) {
