@@ -163,9 +163,7 @@ public class StoreService {
         saveImages(store, requestImages);
     }
 
-    public StoreForUserResponse getStore(Long storeId, Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+    public StoreForUserResponse getStore(Long storeId) {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
@@ -176,6 +174,8 @@ public class StoreService {
         return StoreForUserResponse.builder()
                 .storeName(store.getStoreName())
                 .businessRegiNum(store.getBusinessRegiNum())
+                .reviewCnt(store.getReviews().size())
+                .onSale(store.getPost().isOnSale())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())

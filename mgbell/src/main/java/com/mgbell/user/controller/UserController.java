@@ -51,6 +51,13 @@ public class UserController {
         userService.updatePwd(request, auth.getUserId());
     }
 
+    @AllUserAuth
+    @PatchMapping(path = "/password/reset")
+    @Operation(summary = "비밀번호 재설정")
+    public void resetPwd(@RequestBody PasswordResetRequest request, JwtAuthentication auth) {
+        userService.resetPwd(request, auth.getUserId());
+    }
+
     @PostMapping(path = "/signup/{signupToken}")
     @Operation(summary = "회원가입")
     public void signup(@PathVariable String signupToken,

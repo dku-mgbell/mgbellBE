@@ -8,6 +8,8 @@ import com.mgbell.post.model.dto.request.OnSaleRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.request.PostUpdateRequest;
+import com.mgbell.post.model.dto.response.PostForGuestResponse;
+import com.mgbell.post.model.dto.response.PostPreviewForGuestResponse;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.service.PostService;
@@ -29,7 +31,7 @@ public class PostController {
 
     @AllUserAuth
     @GetMapping("/list")
-    @Operation(summary = "마감백 판매글 리스트")
+    @Operation(summary = "사용자 API: 마감백 판매글 리스트")
     public ResponseEntity<Page<PostPreviewResponse>> list(PostPreviewRequest request,
                                                           JwtAuthentication auth,
                                                           Pageable pageable) {
@@ -39,11 +41,27 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/guest")
+    @Operation(summary = "마감백 판매글 리스트")
+    public ResponseEntity<Page<PostPreviewForGuestResponse>> listForGuest(PostPreviewRequest request,
+                                                          Pageable pageable) {
+
+        Page<PostPreviewForGuestResponse> posts = postService.showAllPostForGuest(pageable, request);
+
+        return ResponseEntity.ok(posts);
+    }
+
     @AllUserAuth
     @GetMapping("/{postId}")
-    @Operation(summary = "판매글 상세페이지")
+    @Operation(summary = "사용자 API: 판매글 상세페이지")
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId, JwtAuthentication auth) {
         return ResponseEntity.ok(postService.getPost(postId, auth.getUserId()));
+    }
+
+    @GetMapping("/guest/{postId}")
+    @Operation(summary = "판매글 상세페이지")
+    public ResponseEntity<PostForGuestResponse> getPostForGuest(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPostForGuest(postId));
     }
 
     @OwnerAuth
