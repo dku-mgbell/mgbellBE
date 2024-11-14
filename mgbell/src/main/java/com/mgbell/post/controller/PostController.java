@@ -3,15 +3,11 @@ package com.mgbell.post.controller;
 import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.global.config.swagger.OwnerAuth;
-import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.post.model.dto.request.OnSaleRequest;
 import com.mgbell.post.model.dto.request.PostCreateRequest;
 import com.mgbell.post.model.dto.request.PostPreviewRequest;
 import com.mgbell.post.model.dto.request.PostUpdateRequest;
-import com.mgbell.post.model.dto.response.PostForGuestResponse;
-import com.mgbell.post.model.dto.response.PostPreviewForGuestResponse;
-import com.mgbell.post.model.dto.response.PostPreviewResponse;
-import com.mgbell.post.model.dto.response.PostResponse;
+import com.mgbell.post.model.dto.response.*;
 import com.mgbell.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
@@ -69,6 +65,13 @@ public class PostController {
     @Operation(summary = "사장님 API: 마감백 등록")
     public void create(@RequestBody @Validated PostCreateRequest request, JwtAuthentication auth) {
         postService.create(request, auth.getUserId());
+    }
+
+    @OwnerAuth
+    @GetMapping
+    @Operation(summary = "사장님 API: 내 판매글 보기")
+    public ResponseEntity<MyPostResponse> create(JwtAuthentication auth) {
+        return ResponseEntity.ok(postService.getMyPost(auth.getUserId()));
     }
 
     @OwnerAuth
