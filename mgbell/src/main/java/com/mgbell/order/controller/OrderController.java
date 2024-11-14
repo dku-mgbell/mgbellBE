@@ -4,6 +4,7 @@ import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.order.model.dto.request.OwnerOrderCancleRequest;
+import com.mgbell.order.model.dto.request.OwnerOrderFilterRequest;
 import com.mgbell.order.model.dto.request.UserOrderRequest;
 import com.mgbell.order.model.dto.response.*;
 import com.mgbell.order.service.OrderService;
@@ -82,7 +83,9 @@ public class OrderController {
     @OwnerAuth
     @GetMapping("/owner/list")
     @Operation(summary = "사장님 API: 주문 내역 보기")
-    public ResponseEntity<Page<OwnerOrderPreviewResponse>> ownerOrderList(Pageable pageable, JwtAuthentication auth) {
-        return ResponseEntity.ok(orderService.getOwnerOrderList(pageable, auth.getUserId()));
+    public ResponseEntity<Page<OwnerOrderPreviewResponse>> ownerOrderList(Pageable pageable,
+                                                                          OwnerOrderFilterRequest request,
+                                                                          JwtAuthentication auth) {
+        return ResponseEntity.ok(orderService.getOwnerOrderList(pageable, request, auth.getUserId()));
     }
 }
