@@ -46,16 +46,15 @@ public class UserController {
 
     @AllUserAuth
     @PatchMapping(path = "/password")
-    @Operation(summary = "비밀번호 재설정")
+    @Operation(summary = "비밀번호 변경")
     public void updatePwd(@RequestBody PasswordUpdateRequest request, JwtAuthentication auth) {
         userService.updatePwd(request, auth.getUserId());
     }
 
-    @AllUserAuth
     @PatchMapping(path = "/password/reset")
     @Operation(summary = "비밀번호 재설정")
-    public void resetPwd(@RequestBody PasswordResetRequest request, JwtAuthentication auth) {
-        userService.resetPwd(request, auth.getUserId());
+    public void resetPwd(@RequestBody PasswordResetRequest request) {
+        userService.resetPwd(request);
     }
 
     @PostMapping(path = "/signup/{signupToken}")

@@ -9,9 +9,7 @@ import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.review.model.entity.Review;
 import com.mgbell.review.repository.ReviewRepository;
-import com.mgbell.user.exception.IncorrectPassword;
-import com.mgbell.user.exception.UserAlreadyExistException;
-import com.mgbell.user.exception.UserNotFoundException;
+import com.mgbell.user.exception.*;
 import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.*;
 import com.mgbell.store.model.entity.Store;
@@ -21,15 +19,19 @@ import com.mgbell.user.repository.TokenRedisRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final TokenRedisRepository tokenRedisRepository;
@@ -40,13 +42,16 @@ public class UserService {
     private final ReviewRepository reviewRepository;
     private final PostRepository postRepository;
 
+    @Value("${s3.url}")
+    private String s3url;
+
     @Transactional
     public void signUp(String signupToken, SignupRequest request) {
         if(isDuplicateEmail(request.getEmail())) {
             throw new UserAlreadyExistException();
         }
         if(!tokenRedisRepository.getToken(request.getEmail()).equals(signupToken)) {
-            throw new IncorrectPassword();
+            throw new IncorrectToken();
         }
 
         User user = User.builder()
@@ -80,12 +85,13 @@ public class UserService {
         List<CurrentOrderResponse> currentOrder = orders.stream()
                 .filter(currOrder -> currOrder.getState().equals(OrderState.REQUESTED)
                         || currOrder.getState().equals(OrderState.ACCEPTED))
-                .map(
-                        currOrder -> new CurrentOrderResponse(
+                .map(currOrder ->
+                        new CurrentOrderResponse(
                                 currOrder.getId(),
                                 currOrder.getStore().getStoreName(),
                                 currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                                currOrder.getState()
+                                currOrder.getState(),
+                                s3url + URLEncoder.encode(currOrder.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
                         )
                 ).toList();
 
@@ -193,13 +199,13 @@ public class UserService {
     }
 
     @Transactional
-    public void resetPwd(PasswordResetRequest request, Long id) {
-        User user = userRepository.findById(id)
+    public void resetPwd(PasswordResetRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-//        if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-//            throw new IncorrectPassword();
-//        }
+        if(!tokenRedisRepository.getToken(user.getEmail()).equals(request.getToken())) {
+            throw new IncorrectToken();
+        }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
