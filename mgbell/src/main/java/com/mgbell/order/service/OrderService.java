@@ -5,11 +5,13 @@ import com.mgbell.order.exception.OrderCompleteNotAvailableException;
 import com.mgbell.order.exception.OrderNotFoundException;
 import com.mgbell.order.exception.PickupTimeOutOfRange;
 import com.mgbell.order.model.dto.request.OwnerOrderCancleRequest;
+import com.mgbell.order.model.dto.request.OwnerOrderFilterRequest;
 import com.mgbell.order.model.dto.request.UserOrderRequest;
 import com.mgbell.order.model.dto.response.*;
 import com.mgbell.order.model.entity.Order;
 import com.mgbell.order.model.entity.OrderState;
 import com.mgbell.order.repository.OrderRepository;
+import com.mgbell.order.repository.OrderRepositoryCustom;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
@@ -38,6 +40,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderRepositoryCustom orderRepositoryCustom;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -112,15 +115,7 @@ public class OrderService {
             throw new UserHasNoAuthorityException();
         }
 
-//        Post post = order.getStore().getPost();
         User user = order.getUser();
-//
-//        int cnt = order.getAmount();
-//        int totalAmount = post.getSalePrice() * cnt;
-//        float carbonReduction = ((float) post.getSalePrice() / 5900) * 2;
-//        int discount = (post.getCostPrice() * cnt) - totalAmount;
-
-//        user.userOrderUpdate(1, carbonReduction, discount);
 
         order.updateOrder(OrderState.ACCEPTED);
     }
@@ -236,13 +231,14 @@ public class OrderService {
         return getUserOrderPreviewList(order);
     }
 
-    public Page<OwnerOrderPreviewResponse> getOwnerOrderList(Pageable pageable, Long userId) {
+    public Page<OwnerOrderPreviewResponse> getOwnerOrderList(Pageable pageable,
+                                                             OwnerOrderFilterRequest request,
+                                                             Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
         Store store = user.getStore();
-
-        Page<Order> order = orderRepository.findByStoreId(pageable, store.getId());
+        Page<Order> order = orderRepositoryCustom.findByWhere(pageable, request, store.getId());
 
         return getOwnerOrderPreviewList(order);
     }
