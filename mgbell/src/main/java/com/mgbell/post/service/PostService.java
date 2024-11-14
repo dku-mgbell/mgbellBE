@@ -3,6 +3,8 @@ package com.mgbell.post.service;
 import com.mgbell.favorite.repository.FavoriteRepository;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
+import com.mgbell.post.model.dto.response.PostForGuestResponse;
+import com.mgbell.post.model.dto.response.PostPreviewForGuestResponse;
 import com.mgbell.post.model.dto.response.PostPreviewResponse;
 import com.mgbell.post.model.dto.response.PostResponse;
 import com.mgbell.post.model.entity.Post;
@@ -51,35 +53,10 @@ public class PostService {
         return getPostResponses(posts, userId);
     }
 
-    public PostResponse getPost(Long postId, Long userId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(PostNotFoundException::new);
-        Store store = post.getStore();
+    public Page<PostPreviewForGuestResponse> showAllPostForGuest(Pageable pageable, PostPreviewRequest request) {
+        Page<Post> posts = postRepositoryCustom.findByWhere(pageable, request);
 
-        boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
-
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
-
-        return PostResponse.builder()
-                .id(postId)
-                .storeId(store.getId())
-                .storeName(store.getStoreName())
-                .bagName(post.getBagName())
-                .description(post.getDescription())
-                .favorite(favorite)
-                .reviewCnt(store.getReviews().size())
-                .address(store.getAddress())
-                .longitude(store.getLongitude())
-                .latitude(store.getLatitude())
-                .onSale(post.isOnSale())
-                .amount(post.getAmount())
-                .startAt(post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")))
-                .endAt(post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")))
-                .costPrice(post.getCostPrice())
-                .salePrice(post.getSalePrice())
-                .images(images)
-                .build();
+        return getPostResponsesForGuest(posts);
     }
 
     public void create(PostCreateRequest request, Long id) {
@@ -187,10 +164,92 @@ public class PostService {
         });
     }
 
+    private Page<PostPreviewForGuestResponse> getPostResponsesForGuest(Page<Post> posts) {
+        return posts.map(currPost -> {
+            Store store = currPost.getStore();
+            List<String> images = store.getImages().stream()
+                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+
+            return new PostPreviewForGuestResponse(
+                    currPost.getPostId(),
+                    store.getStoreName(),
+                    currPost.getBagName(),
+                    store.getReviews().size(),
+                    currPost.isOnSale(),
+                    currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    store.getAddress(),
+                    store.getLongitude(),
+                    store.getLatitude(),
+                    currPost.getCostPrice(),
+                    currPost.getSalePrice(),
+                    currPost.getAmount(),
+                    images);
+        });
+    }
+
+    public PostResponse getPost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+        Store store = post.getStore();
+
+        boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
+
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+
+        return PostResponse.builder()
+                .id(postId)
+                .storeId(store.getId())
+                .storeName(store.getStoreName())
+                .bagName(post.getBagName())
+                .description(post.getDescription())
+                .favorite(favorite)
+                .reviewCnt(store.getReviews().size())
+                .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
+                .onSale(post.isOnSale())
+                .amount(post.getAmount())
+                .startAt(post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .endAt(post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .costPrice(post.getCostPrice())
+                .salePrice(post.getSalePrice())
+                .images(images)
+                .build();
+    }
+
+    public PostForGuestResponse getPostForGuest(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+        Store store = post.getStore();
+
+        List<String> images = store.getImages().stream()
+                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+
+        return PostForGuestResponse.builder()
+                .id(postId)
+                .storeId(store.getId())
+                .storeName(store.getStoreName())
+                .bagName(post.getBagName())
+                .description(post.getDescription())
+                .reviewCnt(store.getReviews().size())
+                .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
+                .onSale(post.isOnSale())
+                .amount(post.getAmount())
+                .startAt(post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .endAt(post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .costPrice(post.getCostPrice())
+                .salePrice(post.getSalePrice())
+                .images(images)
+                .build();
+    }
+
     private void checkOwner(User user) {
         if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
         if(user.getStore() == null) throw new UserHasNoStoreException();
         if(user.getStore().getPost() == null) throw new UserHasNoPostException();
     }
-
 }

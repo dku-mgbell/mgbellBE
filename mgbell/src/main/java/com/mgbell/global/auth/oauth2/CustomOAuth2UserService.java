@@ -53,11 +53,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
                     .orElseThrow(UserNotFoundException::new);
 
-            if(user.getPhoneNumber().isEmpty()){
-                isNewUser = true;
-            } else {
-                throw new UserAlreadyExistException();
-            }
+            isNewUser = user.getPhoneNumber().isEmpty();
+            if(!user.getPassword().isEmpty()) throw new UserAlreadyExistException();
+
         } else {
             isNewUser = true;
             user = userRepository.save(oAuth2UserInfo.toEntity());

@@ -59,11 +59,10 @@ public class StoreController {
         storeService.delete(auth.getUserId());
     }
 
-    @AllUserAuth
     @GetMapping("/{storeId}")
-    @Operation(summary = "일반 사용자 API: 가게 정보 보기")
-    public ResponseEntity<StoreForUserResponse> getStore(@PathVariable Long storeId, JwtAuthentication auth) {
-        return ResponseEntity.ok(storeService.getStore(storeId, auth.getUserId()));
+    @Operation(summary = "가게 정보 보기")
+    public ResponseEntity<StoreForUserResponse> getStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(storeService.getStore(storeId));
     }
 
     @AdminAuth

@@ -10,10 +10,10 @@ import lombok.Getter;
 
 @Getter
 public enum UserRole {
-    GUEST("ROLE_GUEST"),
-    USER("ROLE_USER"),
-    OWNER("ROLE_OWNER"),
-    ADMIN(combine("ROLE_ADMIN", "ROLE_USER", "ROLE_OWNER"));
+    GUEST("GUEST"),
+    USER("USER"),
+    OWNER("OWNER"),
+    ADMIN(combine("ADMIN", "USER", "OWNER"));
 
     @JsonValue
     private final String name;

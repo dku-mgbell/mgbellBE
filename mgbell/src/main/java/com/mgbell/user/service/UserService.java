@@ -192,6 +192,18 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
+    @Transactional
+    public void resetPwd(PasswordResetRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+//        if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+//            throw new IncorrectPassword();
+//        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+
     public UserInfoResponse whoAmI(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);

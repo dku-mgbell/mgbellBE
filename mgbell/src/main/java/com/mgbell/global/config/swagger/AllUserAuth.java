@@ -9,6 +9,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @SecurityRequirement(name = "JWT Token")
-@Secured({"ROLE_USER", "ROLE_OWNER"})
+@Secured({"USER", "OWNER"})
 public @interface AllUserAuth {
 }

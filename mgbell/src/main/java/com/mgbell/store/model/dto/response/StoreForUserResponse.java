@@ -13,6 +13,8 @@ import java.util.List;
 public class StoreForUserResponse {
     private String storeName;
     private String businessRegiNum;
+    private int reviewCnt;
+    private boolean onSale;
     private String address;
     private String longitude;
     private String latitude;

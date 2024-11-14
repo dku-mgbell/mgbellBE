@@ -22,6 +22,12 @@ public class EmailController {
         emailService.sendVerificationCode(request.getEmail());
     }
 
+    @PostMapping("/sendCode/password")
+    @Operation(summary = "이메일 인증 코드 전송")
+    public void sendVerificationCodeForPassword(@RequestBody @Validated EmailRequest request) {
+        emailService.sendVerificationCode(request.getEmail());
+    }
+
     @PostMapping("/verifyCode")
     @Operation(summary = "이메일 인증 코드 검증")
     public ResponseEntity<TokenValidationResponse> verifyCode(@RequestBody TokenValidationRequest request) {
