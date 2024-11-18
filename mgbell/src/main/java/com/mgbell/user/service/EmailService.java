@@ -3,8 +3,10 @@ package com.mgbell.user.service;
 import com.mgbell.global.nhn.service.NhnService;
 import com.mgbell.user.exception.IncorrectEmailCode;
 import com.mgbell.user.exception.UserAlreadyExistException;
+import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.response.TokenValidationResponse;
 import com.mgbell.user.repository.TokenRedisRepository;
+import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,6 +24,7 @@ public class EmailService {
     private final UserService userService;
     private final TokenRedisRepository tokenRedisRepository;
     private final NhnService nhnService;
+    private final UserRepository userRepository;
 
     @Transactional
     public void sendVerificationCode(String email) {
@@ -37,6 +40,9 @@ public class EmailService {
     }
 
     public void sendVerificationCodeForPassword(String email) {
+        userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
         String code = createRandomAccessCode();
 
         tokenRedisRepository.saveToken(email, code);
