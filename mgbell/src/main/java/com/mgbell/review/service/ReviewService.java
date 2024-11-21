@@ -217,8 +217,8 @@ public class ReviewService {
                 new ReviewCountsResponse(
                         store.getBest(),
                         store.getGood(),
-                        store.getNotGood(),
-                        store.getNotBad()
+                        store.getNotBad(),
+                        store.getNotGood()
                 ),
                 store.getReviews().size()
         );
