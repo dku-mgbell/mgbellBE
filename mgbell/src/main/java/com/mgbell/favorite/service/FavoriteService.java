@@ -84,6 +84,7 @@ public class FavoriteService {
                     post.getCostPrice(),
                     post.getSalePrice(),
                     post.getAmount(),
+                    store.getReviews().size(),
                     s3url + URLEncoder.encode(store.getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
             );
         });
