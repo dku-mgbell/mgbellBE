@@ -102,6 +102,7 @@ public class OrderService {
         int leftAmount = post.getAmount() + order.getAmount();
 
         post.setAmount(leftAmount);
+        post.setOnSale(true);
 
         order.updateOrder(OrderState.USER_CANCELED);
     }

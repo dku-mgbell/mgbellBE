@@ -129,6 +129,9 @@ public class ReviewService {
                 .orElseThrow(ReviewNotFoundException::new);
 
         decreaseReviewScore(review.getStore(), review.getReviewScore());
+        review.setUser(null);
+        review.setOrder(null);
+        review.getStore().getReviews().remove(review);
         reviewRepository.delete(review);
     }
 
