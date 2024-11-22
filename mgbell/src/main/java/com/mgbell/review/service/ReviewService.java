@@ -254,9 +254,10 @@ public class ReviewService {
     }
 
     public Page<ReviewResponse> getReviewPage(Page<Review> reviews) {
-        return reviews.map(currReview ->
-                new ReviewResponse(
-                        currReview.getUser().getName(),
+        return reviews.map(currReview -> {
+            if (currReview.getUser() == null) {
+                return new ReviewResponse(
+                        "탈퇴한 사용자",
                         currReview.getCreatedAt(),
                         currReview.getReviewScore(),
                         currReview.getContent(),
@@ -265,7 +266,21 @@ public class ReviewService {
                                 s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList(),
                         currReview.getOwnerComent(),
                         currReview.getOwnerCommentDate()
-                ));
+                );
+            }
+
+            return new ReviewResponse(
+                    currReview.getUser().getName(),
+                    currReview.getCreatedAt(),
+                    currReview.getReviewScore(),
+                    currReview.getContent(),
+                    currReview.getSatisfiedReasons(),
+                    currReview.getImages().stream().map(currImage ->
+                            s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList(),
+                    currReview.getOwnerComent(),
+                    currReview.getOwnerCommentDate()
+            );
+        });
     }
 
     @Transactional
