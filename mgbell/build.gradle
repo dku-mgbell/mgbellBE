@@ -68,6 +68,9 @@ dependencies {
     // thumbnailator
     implementation 'net.coobird:thumbnailator:0.4.11'
 
+    // fcm
+    implementation 'com.google.firebase:firebase-admin:9.4.1'
+
 }
 
 tasks.named('test') {
