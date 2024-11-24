@@ -48,9 +48,9 @@ public class Store extends BaseEntity {
     private int good;
     private int notBad;
     private int notGood;
-
-    @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoreImage> images = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<StoreImage> images = new ArrayList<>();
 
     @NotNull
     @OneToOne
@@ -61,9 +61,9 @@ public class Store extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
-
-    @OneToMany
-    private List<Review> reviews = new ArrayList<>();
+//
+//    @OneToMany
+//    private List<Review> reviews = new ArrayList<>();
 
     public Store(String storeName, String ownerName, String contact, String businessRegiNum,
                  String address, String longitude, String latitude, StoreType storeType, Status status, User user) {

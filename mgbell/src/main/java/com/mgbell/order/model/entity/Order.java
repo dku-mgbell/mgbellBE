@@ -36,13 +36,13 @@ public class Order extends BaseEntity {
     private CancelReason cancelReason;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "store_id")
     private Store store;
 

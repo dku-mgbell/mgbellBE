@@ -38,18 +38,18 @@ public class User {
     private int orderCnt;
     private float carbonReduction;
     private int totalDiscount;
-
-    @Setter
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private Store store;
-
-    @Setter
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Order> order = new ArrayList<>();
-
-    @Setter
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Review> review = new ArrayList<>();
+//
+//    @Setter
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private Store store;
+//
+//    @Setter
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<Order> order = new ArrayList<>();
+//
+//    @Setter
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<Review> review = new ArrayList<>();
 
     public void userOrderUpdate(int orderCnt, float carbonReduction, int totalDiscount) {
         this.orderCnt += orderCnt;

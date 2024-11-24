@@ -81,7 +81,7 @@ public class ReviewService {
                 order
                 );
 
-        store.getReviews().add(review);
+//        store.getReviews().add(review);
         increaseReviewScore(order.getStore(), request.getReviewScore());
 
         if(requestImages != null)
@@ -133,7 +133,7 @@ public class ReviewService {
         decreaseReviewScore(review.getStore(), review.getReviewScore());
         review.setUser(null);
         review.setOrder(null);
-        review.getStore().getReviews().remove(review);
+//        review.getStore().getReviews().remove(review);
         reviewRepository.delete(review);
     }
 
@@ -151,8 +151,10 @@ public class ReviewService {
     public Page<OwnerReviewResponse> getOwnerReviewList(Pageable pageable, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
+        Store store = storeRepository.findByUserId(userId)
+                .orElseThrow(StoreNotFoundException::new);
 
-        Page<Review> review = reviewRepository.findByStoreId(pageable, user.getStore().getId());
+        Page<Review> review = reviewRepository.findByStoreId(pageable, store.getId());
 
         return getOwnerReviewPage(review);
     }
@@ -222,7 +224,8 @@ public class ReviewService {
                         store.getNotBad(),
                         store.getNotGood()
                 ),
-                store.getReviews().size()
+                reviewRepository.findByStoreId(storeId).size()
+//                store.getReviews().size()
         );
     }
 

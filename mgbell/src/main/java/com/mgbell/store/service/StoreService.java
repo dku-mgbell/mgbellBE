@@ -2,6 +2,13 @@ package com.mgbell.store.service;
 
 import com.mgbell.favorite.model.entity.Favorite;
 import com.mgbell.favorite.repository.FavoriteRepository;
+import com.mgbell.order.repository.OrderRepository;
+import com.mgbell.post.model.entity.Post;
+import com.mgbell.post.repository.PostRepository;
+import com.mgbell.review.model.entity.Review;
+import com.mgbell.review.model.entity.ReviewImage;
+import com.mgbell.review.repository.ReviewImageRepositoty;
+import com.mgbell.review.repository.ReviewRepository;
 import com.mgbell.store.model.dto.response.MyStoreResponse;
 import com.mgbell.store.model.entity.StoreImage;
 import com.mgbell.global.s3.service.S3Service;
@@ -41,6 +48,11 @@ public class StoreService {
     private final FavoriteRepository favoriteRepository;
     private final StoreImageRepository imageRepository;
     private final S3Service s3Service;
+    private final StoreImageRepository storeImageRepository;
+    private final ReviewRepository reviewRepository;
+    private final PostRepository postRepository;
+    private final OrderRepository orderRepository;
+    private final ReviewImageRepositoty reviewImageRepositoty;
 
     @Value("${s3.url}")
     private String s3url;
@@ -51,7 +63,7 @@ public class StoreService {
                 .orElseThrow(UserNotFoundException::new);
 
         if(user.getUserRole().isUser()) throw new UserHasNoAuthorityException();
-        if(user.getStore() != null) throw new AlreadyHasStoreException();
+        if(storeRepository.findByUserId(id).isPresent()) throw new AlreadyHasStoreException();
 
         Store store = new Store(
                 request.getStoreName(),
@@ -112,6 +124,10 @@ public class StoreService {
 
         store.setStatus(Status.INACTIVE);
 
+        if(images == null) {
+            deleteStoreImages(store);
+            return;
+        }
         updateImages(store, images);
     }
 
@@ -119,12 +135,46 @@ public class StoreService {
     public void delete(Long id) {
         Store store = storeRepository.findByUserId(id)
                         .orElseThrow(StoreNotFoundException::new);
-        store.setPost(null);
+
+        // Todo 리뷰 있으면 삭제 안 되는 오류 수정해야함!!!!
+
+        if(!reviewRepository.findByStoreId(id).isEmpty()) {
+
+            reviewRepository.findByStoreId(id).forEach(currReview -> {
+                deleteReviewImages(currReview);
+
+                currReview.setUser(null);
+                currReview.setOrder(null);
+                currReview.setStore(null);
+
+                reviewRepository.delete(currReview);
+            });
+        }
+
+        if(!orderRepository.findByStoreId(id).isEmpty()) {
+            orderRepository.findByStoreId(id).forEach(currOrder -> {
+//                currOrder.setUser(null);
+                currOrder.setStore(null);
+                orderRepository.delete(currOrder);
+            });
+        }
+
+        if(store.getPost() != null) {
+            Post post = store.getPost();
+            post.setStore(null);
+            post.setUser(null);
+            store.setPost(null);
+
+            postRepository.delete(post);
+        }
+
         List<Favorite> favorite = favoriteRepository.findByStoreId(store.getId());
 
         deleteFavorite(favorite);
 
-        storeRepository.deleteById(id);
+        deleteStoreImages(store);
+
+        storeRepository.delete(store);
     }
 
     private void deleteFavorite(List<Favorite> favorite) {
@@ -148,20 +198,34 @@ public class StoreService {
                     .build();
 
             imageRepository.save(image);
-            store.getImages().add(image);
+//            store.getImages().add(image);
         });
     }
 
     @Transactional
     public void updateImages(Store store, List<MultipartFile> requestImages) {
-        List<StoreImage> images = store.getImages();
-        for(StoreImage image : images) {
-            imageRepository.delete(image);
+        deleteStoreImages(store);
+        saveImages(store, requestImages);
+    }
+
+    @Transactional
+    public void deleteReviewImages(Review review) {
+        List<ReviewImage> images = review.getImages();
+        for(ReviewImage image : images) {
+            reviewImageRepositoty.delete(image);
             s3Service.delete(image.getOriginalFileDir());
             s3Service.delete(image.getThumbnailFileDir());
         }
+    }
 
-        saveImages(store, requestImages);
+    @Transactional
+    public void deleteStoreImages(Store store) {
+        List<StoreImage> images = storeImageRepository.findByStoreId(store.getId());
+        for(StoreImage image : images) {
+            s3Service.delete(image.getOriginalFileDir());
+            s3Service.delete(image.getThumbnailFileDir());
+            imageRepository.delete(image);
+        }
     }
 
     public StoreForUserResponse getStore(Long storeId) {
@@ -169,13 +233,18 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+        List<String> images = storeImageRepository.findByStoreId(storeId).stream()
+                .map(currImage ->
+                        s3url +
+                                URLEncoder.encode(
+                                        currImage.getOriginalFileDir(),
+                                        StandardCharsets.UTF_8)
+                ).toList();
 
         return StoreForUserResponse.builder()
                 .storeName(store.getStoreName())
                 .businessRegiNum(store.getBusinessRegiNum())
-                .reviewCnt(store.getReviews().size())
+                .reviewCnt(reviewRepository.findByStoreId(storeId).size())
                 .onSale(store.getPost().isOnSale())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
@@ -206,8 +275,13 @@ public class StoreService {
     public MyStoreResponse getMyStoreInfo(Long id) {
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+        List<String> images = storeImageRepository.findByStoreId(id).stream()
+                .map(currImage ->
+                        s3url +
+                                URLEncoder.encode(
+                                        currImage.getOriginalFileDir(),
+                                        StandardCharsets.UTF_8)
+                ).toList();
 
         return MyStoreResponse.builder()
                 .id(store.getId())
@@ -227,8 +301,13 @@ public class StoreService {
     public Page<StoreResponse> getStoreResponse(Page<Store> stores) {
 
         return stores.map(store -> {
-            List<String> images = store.getImages().stream()
-                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+            List<String> images = storeImageRepository.findByStoreId(store.getId()).stream()
+                    .map(currImage ->
+                            s3url +
+                                    URLEncoder.encode(
+                                            currImage.getOriginalFileDir(),
+                                            StandardCharsets.UTF_8)
+                    ).toList();
 
             return new StoreResponse(
                     store.getId(),
