@@ -143,6 +143,7 @@ public class SecurityConfig {
                     authorizeRequests.requestMatchers("/order/**").permitAll();
                     authorizeRequests.requestMatchers("/favorite/**").permitAll();
                     authorizeRequests.requestMatchers("/review/**").permitAll();
+                    authorizeRequests.requestMatchers("/notification/**").permitAll();
                     authorizeRequests.requestMatchers("/login/**").permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
