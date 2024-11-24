@@ -6,6 +6,7 @@ import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.store.model.dto.request.StoreEditRequest;
 import com.mgbell.store.model.dto.request.StoreRegisterRequest;
+import com.mgbell.store.model.dto.response.MyStoreResponse;
 import com.mgbell.store.model.dto.response.StoreForUserResponse;
 import com.mgbell.store.model.dto.response.StoreResponse;
 import com.mgbell.store.service.StoreService;
@@ -48,7 +49,7 @@ public class StoreController {
     @OwnerAuth
     @GetMapping("/myStore")
     @Operation(summary = "사장님 API: 내 가게 정보 보기")
-    public ResponseEntity<StoreResponse> getMyStoreInfo(JwtAuthentication auth) {
+    public ResponseEntity<MyStoreResponse> getMyStoreInfo(JwtAuthentication auth) {
         return ResponseEntity.ok(storeService.getMyStoreInfo(auth.getUserId()));
     }
 

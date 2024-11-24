@@ -1,27 +1,26 @@
-package com.mgbell.store.model.dto.request;
+package com.mgbell.store.model.dto.response;
 
+import com.mgbell.store.model.entity.Status;
 import com.mgbell.store.model.entity.StoreType;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class StoreEditRequest {
-    @NotNull
+public class MyStoreResponse {
+    private Long id;
     private String storeName;
-    @NotNull
-    private String businessRegiNum;
-    @NotNull
     private String ownerName;
-    @NotNull
     private String contact;
-    @NotNull
+    private String businessRegiNum;
     private String address;
     private String longitude;
     private String latitude;
-    @NotNull
     private StoreType storeType;
+    private Status status;
+    private List<String> originalFileDir;
 }

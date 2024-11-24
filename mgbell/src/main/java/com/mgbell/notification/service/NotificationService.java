@@ -12,6 +12,8 @@ import com.mgbell.order.model.entity.Order;
 import com.mgbell.order.repository.OrderRepository;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.store.repository.StoreRepository;
+import com.mgbell.user.exception.UserNotFoundException;
+import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -134,8 +136,11 @@ public class NotificationService {
         return fcmRedisRepository.hasKey(studentId);
     }
 
-    public void register(TokenRegisterRequest request){
-        fcmRedisRepository.saveToken(request);
+    public void register(Long userId, TokenRegisterRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        fcmRedisRepository.saveToken(user.getEmail(), request.getToken());
     }
 
     public void deleteToken(String studentId){

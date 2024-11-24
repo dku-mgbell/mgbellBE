@@ -2,6 +2,7 @@ package com.mgbell.store.service;
 
 import com.mgbell.favorite.model.entity.Favorite;
 import com.mgbell.favorite.repository.FavoriteRepository;
+import com.mgbell.store.model.dto.response.MyStoreResponse;
 import com.mgbell.store.model.entity.StoreImage;
 import com.mgbell.global.s3.service.S3Service;
 import com.mgbell.store.exception.AlreadyHasStoreException;
@@ -202,15 +203,17 @@ public class StoreService {
         return getStoreResponse(stores);
     }
 
-    public StoreResponse getMyStoreInfo(Long id) {
+    public MyStoreResponse getMyStoreInfo(Long id) {
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
         List<String> images = store.getImages().stream()
                 .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
-        return StoreResponse.builder()
+        return MyStoreResponse.builder()
                 .id(store.getId())
                 .storeName(store.getStoreName())
+                .ownerName(store.getOwnerName())
+                .contact(store.getContact())
                 .businessRegiNum(store.getBusinessRegiNum())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())

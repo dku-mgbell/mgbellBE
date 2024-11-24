@@ -1,6 +1,5 @@
 package com.mgbell.notification.repository;
 
-import com.mgbell.notification.model.dto.request.TokenRegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,9 +10,9 @@ public class FcmRedisRepository {
 
     private final StringRedisTemplate tokenRedisTemplate;
 
-    public void saveToken(TokenRegisterRequest request) {
+    public void saveToken(String email, String token) {
         tokenRedisTemplate.opsForValue()
-                .set(request.getEmail(), request.getToken());
+                .set(email, token);
     }
 
     public String getToken(String studentId) {
