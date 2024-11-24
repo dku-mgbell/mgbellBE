@@ -6,8 +6,10 @@ import com.mgbell.favorite.model.dto.response.FavoriteResponse;
 import com.mgbell.favorite.model.entity.Favorite;
 import com.mgbell.favorite.repository.FavoriteRepository;
 import com.mgbell.post.model.entity.Post;
+import com.mgbell.review.repository.ReviewRepository;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.store.model.entity.Store;
+import com.mgbell.store.repository.StoreImageRepository;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.entity.user.User;
@@ -31,6 +33,8 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final StoreImageRepository storeImageRepository;
 
     @Value("${s3.url}")
     private String s3url;
@@ -84,8 +88,14 @@ public class FavoriteService {
                     post.getCostPrice(),
                     post.getSalePrice(),
                     post.getAmount(),
-                    store.getReviews().size(),
-                    s3url + URLEncoder.encode(store.getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
+                    reviewRepository.findByStoreId(store.getId()).size(),
+                    s3url +
+                            URLEncoder.encode(
+                                    storeImageRepository.findByStoreId(store.getId())
+                                            .get(0)
+                                            .getOriginalFileDir(),
+                                    StandardCharsets.UTF_8
+                            )
             );
         });
     }

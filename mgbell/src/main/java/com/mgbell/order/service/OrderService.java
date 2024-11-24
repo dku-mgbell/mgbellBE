@@ -18,6 +18,7 @@ import com.mgbell.post.repository.PostRepository;
 import com.mgbell.review.repository.ReviewRepository;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.store.model.entity.Store;
+import com.mgbell.store.repository.StoreImageRepository;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserNotFoundException;
@@ -45,6 +46,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
+    private final StoreImageRepository storeImageRepository;
     @Value("${s3.link}")
     private String s3url;
 
@@ -197,7 +199,12 @@ public class OrderService {
                 order.getSubtotal(),
                 order.getRequest(),
                 order.getCancelReason(),
-        s3url + URLEncoder.encode(order.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
+        s3url +
+                URLEncoder.encode(
+                        storeImageRepository.findByStoreId(store.getId())
+                                .get(0)
+                                .getOriginalFileDir(), StandardCharsets.UTF_8
+                )
         );
     }
 
@@ -239,7 +246,9 @@ public class OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        Store store = user.getStore();
+        Store store = storeRepository.findByUserId(userId)
+                .orElseThrow(StoreNotFoundException::new);
+
         Page<Order> order = orderRepositoryCustom.findByWhere(pageable, request, store.getId());
 
         return getOwnerOrderPreviewList(order);
@@ -247,20 +256,30 @@ public class OrderService {
 
     public Page<UserOrderPreviewResponse> getUserOrderPreviewList(Page<Order> list) {
 
-        return list.map(currOrder ->
-                new UserOrderPreviewResponse(
-                    currOrder.getId(),
-                    currOrder.getStore().getPost().getPostId(),
-                    currOrder.getStore().getId(),
-                    currOrder.getCreatedAt(),
-                    currOrder.getStore().getStoreName(),
-                    currOrder.getStore().getPost().getBagName(),
-                    currOrder.getState(),
-                    reviewRepository.existsByOrderId(currOrder.getId()),
-                    currOrder.getAmount(),
-                    currOrder.getSubtotal(),
-            s3url + URLEncoder.encode(currOrder.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
-                ));
+        return list.map(currOrder -> {
+            Store store = currOrder.getStore();
+            Post post = store.getPost();
+
+            return new UserOrderPreviewResponse(
+                            post.getPostId(),
+                            currOrder.getId(),
+                            store.getId(),
+                            currOrder.getCreatedAt(),
+                            store.getStoreName(),
+                            post.getBagName(),
+                            currOrder.getState(),
+                            reviewRepository.existsByOrderId(currOrder.getId()),
+                            currOrder.getAmount(),
+                            currOrder.getSubtotal(),
+                            s3url +
+                                    URLEncoder.encode(
+                                            storeImageRepository.findByStoreId(store.getId())
+                                                    .get(0)
+                                                    .getOriginalFileDir(), StandardCharsets.UTF_8
+                                    )
+                    );
+                }
+        );
     }
 
     public Page<OwnerOrderPreviewResponse> getOwnerOrderPreviewList(Page<Order> list) {

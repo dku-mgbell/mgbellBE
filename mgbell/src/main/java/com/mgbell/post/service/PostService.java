@@ -7,6 +7,10 @@ import com.mgbell.post.model.dto.response.*;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
+import com.mgbell.review.repository.ReviewRepository;
+import com.mgbell.store.exception.StoreNotFoundException;
+import com.mgbell.store.repository.StoreImageRepository;
+import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
 import com.mgbell.user.exception.UserHasNoPostException;
 import com.mgbell.user.exception.UserHasNoStoreException;
@@ -36,6 +40,9 @@ public class PostService {
     private final PostRepositoryCustom postRepositoryCustom;
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
+    private final StoreRepository storeRepository;
+    private final StoreImageRepository storeImageRepository;
+    private final ReviewRepository reviewRepository;
 
     @Value("${s3.url}")
     private String s3url;
@@ -59,18 +66,28 @@ public class PostService {
     public MyPostResponse getMyPost(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Store store = user.getStore();
-        Post post = store.getPost();
+        Store store = storeRepository.findByUserId(userId)
+                .orElseThrow(StoreNotFoundException::new);
+        Post post = postRepository.findByUserId(userId)
+                .orElseThrow(PostNotFoundException::new);
 
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+//                store.getImages().stream()
+        List<String> images = storeImageRepository.findByStoreId(store.getId())
+                .stream()
+                .map(currImage ->
+                        s3url +
+                                URLEncoder.encode(
+                                        currImage.getOriginalFileDir(),
+                                        StandardCharsets.UTF_8)
+                ).toList();
 
         return new MyPostResponse(
                 post.getPostId(),
                 store.getStoreName(),
                 post.getBagName(),
                 post.getDescription(),
-                store.getReviews().size(),
+                reviewRepository.findByStoreId(store.getId()).size(),
+//                store.getReviews().size(),
                 store.getAddress(),
                 store.getLongitude(),
                 store.getLatitude(),
@@ -90,7 +107,8 @@ public class PostService {
 
         if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
 
-        Store store = user.getStore();
+        Store store = storeRepository.findByUserId(id)
+                .orElseThrow(StoreNotFoundException::new);
 
         Post post = Post.builder()
                 .user(user)
@@ -117,7 +135,8 @@ public class PostService {
 
         checkOwner(user);
 
-        Post post = user.getStore().getPost();
+        Post post = postRepository.findByUserId(id)
+                .orElseThrow(PostNotFoundException::new);
 
         post.updatePost(
                 request.getBagName(),
@@ -138,7 +157,9 @@ public class PostService {
 
         checkOwner(user);
 
-        Post post = user.getStore().getPost();
+        Post post = postRepository.findByUserId(id)
+                .orElseThrow(PostNotFoundException::new);
+
         post.setOnSale(request.isOnSale());
     }
 
@@ -152,7 +173,8 @@ public class PostService {
         Post post = postRepository.findByUserId(id)
                 .orElseThrow(PostNotFoundException::new);
 
-        Store store = user.getStore();
+        Store store = storeRepository.findByUserId(id)
+                .orElseThrow(StoreNotFoundException::new);
 
         if(!id.equals(post.getUser().getId())) {
             throw new UserHasNoAuthorityException();
@@ -166,8 +188,14 @@ public class PostService {
     private Page<PostPreviewResponse> getPostResponses(Page<Post> posts, Long userId) {
         return posts.map(currPost -> {
             Store store = currPost.getStore();
-            List<String> images = store.getImages().stream()
-                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+            List<String> images = storeImageRepository.findByStoreId(store.getId())
+                    .stream()
+                    .map(currImage ->
+                            s3url +
+                                    URLEncoder.encode(
+                                            currImage.getOriginalFileDir(),
+                                            StandardCharsets.UTF_8)
+                    ).toList();
             boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
             return new PostPreviewResponse(
@@ -175,7 +203,8 @@ public class PostService {
                     store.getStoreName(),
                     currPost.getBagName(),
                     favorite,
-                    store.getReviews().size(),
+                    reviewRepository.findByStoreId(store.getId()).size(),
+//                    store.getReviews().size(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -192,14 +221,23 @@ public class PostService {
     private Page<PostPreviewForGuestResponse> getPostResponsesForGuest(Page<Post> posts) {
         return posts.map(currPost -> {
             Store store = currPost.getStore();
-            List<String> images = store.getImages().stream()
-                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+            List<String> images = storeImageRepository.findByStoreId(store.getId())
+                    .stream()
+                    .map(currImage ->
+                            s3url +
+                                    URLEncoder.encode(
+                                            currImage.getOriginalFileDir(),
+                                            StandardCharsets.UTF_8)
+                    ).toList();
+//            List<String> images = store.getImages().stream()
+//                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
             return new PostPreviewForGuestResponse(
                     currPost.getPostId(),
                     store.getStoreName(),
                     currPost.getBagName(),
-                    store.getReviews().size(),
+                    reviewRepository.findByStoreId(store.getId()).size(),
+//                    store.getReviews().size(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -220,8 +258,16 @@ public class PostService {
 
         boolean favorite = favoriteRepository.existsByStoreIdAndUserId(store.getId(), userId);
 
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+        List<String> images = storeImageRepository.findByStoreId(store.getId())
+                .stream()
+                .map(currImage ->
+                        s3url +
+                                URLEncoder.encode(
+                                        currImage.getOriginalFileDir(),
+                                        StandardCharsets.UTF_8)
+                ).toList();
+//        List<String> images = store.getImages().stream()
+//                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostResponse.builder()
                 .id(postId)
@@ -230,7 +276,7 @@ public class PostService {
                 .bagName(post.getBagName())
                 .description(post.getDescription())
                 .favorite(favorite)
-                .reviewCnt(store.getReviews().size())
+                .reviewCnt(reviewRepository.findByStoreId(store.getId()).size())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())
@@ -249,8 +295,16 @@ public class PostService {
                 .orElseThrow(PostNotFoundException::new);
         Store store = post.getStore();
 
-        List<String> images = store.getImages().stream()
-                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
+        List<String> images = storeImageRepository.findByStoreId(store.getId())
+                .stream()
+                .map(currImage ->
+                        s3url +
+                                URLEncoder.encode(
+                                        currImage.getOriginalFileDir(),
+                                        StandardCharsets.UTF_8)
+                ).toList();
+//        List<String> images = store.getImages().stream()
+//                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostForGuestResponse.builder()
                 .id(postId)
@@ -258,7 +312,7 @@ public class PostService {
                 .storeName(store.getStoreName())
                 .bagName(post.getBagName())
                 .description(post.getDescription())
-                .reviewCnt(store.getReviews().size())
+                .reviewCnt(reviewRepository.findByStoreId(store.getId()).size())
                 .address(store.getAddress())
                 .longitude(store.getLongitude())
                 .latitude(store.getLatitude())
@@ -274,7 +328,7 @@ public class PostService {
 
     private void checkOwner(User user) {
         if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
-        if(user.getStore() == null) throw new UserHasNoStoreException();
-        if(user.getStore().getPost() == null) throw new UserHasNoPostException();
+        if(storeRepository.findByUserId(user.getId()).isEmpty()) throw new UserHasNoStoreException();
+        if(postRepository.findByUserId(user.getId()).isEmpty()) throw new UserHasNoPostException();
     }
 }

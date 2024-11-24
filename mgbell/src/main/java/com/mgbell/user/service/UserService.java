@@ -1,14 +1,22 @@
 package com.mgbell.user.service;
 
+import com.mgbell.favorite.model.entity.Favorite;
+import com.mgbell.favorite.repository.FavoriteRepository;
 import com.mgbell.global.auth.jwt.JwtProvider;
 import com.mgbell.global.auth.jwt.JwtToken;
+import com.mgbell.global.s3.service.S3Service;
 import com.mgbell.order.model.entity.Order;
 import com.mgbell.order.model.entity.OrderState;
 import com.mgbell.order.repository.OrderRepository;
 import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.review.model.entity.Review;
+import com.mgbell.review.model.entity.ReviewImage;
+import com.mgbell.review.repository.ReviewImageRepositoty;
 import com.mgbell.review.repository.ReviewRepository;
+import com.mgbell.store.model.entity.StoreImage;
+import com.mgbell.store.repository.StoreImageRepository;
+import com.mgbell.store.service.StoreService;
 import com.mgbell.user.exception.*;
 import com.mgbell.user.model.dto.request.*;
 import com.mgbell.user.model.dto.response.*;
@@ -41,6 +49,11 @@ public class UserService {
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
     private final PostRepository postRepository;
+    private final S3Service s3Service;
+    private final StoreImageRepository storeImageRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ReviewImageRepositoty reviewImageRepositoty;
+    private final StoreService storeService;
 
     @Value("${s3.url}")
     private String s3url;
@@ -81,7 +94,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        List<Order> orders = user.getOrder();
+        List<Order> orders = orderRepository.findByUserId(userId);
         List<CurrentOrderResponse> currentOrder = orders.stream()
                 .filter(currOrder -> currOrder.getState().equals(OrderState.REQUESTED)
                         || currOrder.getState().equals(OrderState.ACCEPTED))
@@ -91,7 +104,12 @@ public class UserService {
                                 currOrder.getStore().getStoreName(),
                                 currOrder.getPickupTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                                 currOrder.getState(),
-                                s3url + URLEncoder.encode(currOrder.getStore().getImages().get(0).getOriginalFileDir(), StandardCharsets.UTF_8)
+                                s3url +
+                                        URLEncoder.encode(
+                                                storeImageRepository.findByStoreId(currOrder.getStore().getId())
+                                                        .get(0)
+                                                        .getOriginalFileDir(), StandardCharsets.UTF_8
+                                        )
                         )
                 ).toList();
 
@@ -146,43 +164,41 @@ public class UserService {
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
-        Store store = user.getStore();
-        List<Review> review = user.getReview();
-        List<Order> order = user.getOrder();
+        Store store = storeRepository.findByUserId(id)
+                .orElse(null);
 
         if (store != null) {
-            store.getPost().setStore(null);
-            store.getPost().setUser(null);
-            postRepository.delete(store.getPost());
+            storeService.delete(id);
+        } else {
+            List<Review> review = reviewRepository.findByUserId(id);
+            List<Order> order = orderRepository.findByUserId(id);
+            List<Favorite> favorite = favoriteRepository.findByUserId(id);
 
-            store.setPost(null);
+            if (review != null) {
+                review.forEach(currReview -> {
+                            deleteReviewImages(currReview);
 
-            reviewRepository.deleteAll(store.getReviews());
+                            currReview.setUser(null);
+                            currReview.setOrder(null);
+                        }
+                );
+            }
 
-            storeRepository.delete(store);
-            user.setStore(null);
+            if (order != null) {
+                order.forEach(currOrder -> {
+                            currOrder.setStore(null);
+                            orderRepository.delete(currOrder);
+                        }
+                );
+            }
+
+            if (favorite != null) {
+                favorite.forEach(currFavorite -> {
+                    favoriteRepository.delete(currFavorite);
+                });
+            }
         }
 
-        if (review != null) {
-            review.forEach(currReview -> {
-                        currReview.setUser(null);
-                        currReview.setOrder(null);
-                    }
-            );
-
-            user.setReview(null);
-        }
-
-        if (order != null) {
-            order.forEach(currOrder -> {
-                        currOrder.setUser(null);
-                        currOrder.setStore(null);
-                        orderRepository.deleteById(currOrder.getId());
-                    }
-            );
-
-            user.setOrder(null);
-        }
         userRepository.deleteById(id);
     }
 
@@ -219,5 +235,24 @@ public class UserService {
                 user.getName(),
                 user.getEmail()
         );
+    }
+    @Transactional
+    public void deleteReviewImages(Review review) {
+        List<ReviewImage> images = review.getImages();
+        for(ReviewImage image : images) {
+            reviewImageRepositoty.delete(image);
+            s3Service.delete(image.getOriginalFileDir());
+            s3Service.delete(image.getThumbnailFileDir());
+        }
+    }
+
+    @Transactional
+    public void deleteStoreImages(Store store) {
+        List<StoreImage> images = storeImageRepository.findByStoreId(store.getId());
+        for(StoreImage image : images) {
+            s3Service.delete(image.getOriginalFileDir());
+            s3Service.delete(image.getThumbnailFileDir());
+            storeImageRepository.delete(image);
+        }
     }
 }
