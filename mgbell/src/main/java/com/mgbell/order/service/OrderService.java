@@ -182,6 +182,7 @@ public class OrderService {
         Store store = order.getStore();
 
         return new UserOrderResponse(
+                store.getPost().getPostId(),
                 order.getId(),
                 store.getId(),
                 store.getStoreName(),

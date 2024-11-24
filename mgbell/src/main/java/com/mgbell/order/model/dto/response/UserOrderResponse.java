@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class UserOrderResponse {
+    private Long id; // 판매글 id
     private Long orderId;
     private Long storeId;
     private String storeName;
