@@ -1,5 +1,6 @@
 package com.mgbell.order.service;
 
+import com.mgbell.notification.service.NotificationService;
 import com.mgbell.order.exception.AmountIsTooBigException;
 import com.mgbell.order.exception.OrderCompleteNotAvailableException;
 import com.mgbell.order.exception.OrderNotFoundException;
@@ -47,6 +48,8 @@ public class OrderService {
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
     private final StoreImageRepository storeImageRepository;
+    private final NotificationService notificationService;
+
     @Value("${s3.link}")
     private String s3url;
 
@@ -87,6 +90,8 @@ public class OrderService {
                 .subtotal(totalAmount)
                 .build();
 
+        notificationService.sendOrderRequest(store.getUser().getId());
+
         orderRepository.save(order);
     }
 
@@ -105,6 +110,8 @@ public class OrderService {
 
         post.setAmount(leftAmount);
         post.setOnSale(true);
+
+        notificationService.sendOrderRequest(order.getStore().getUser().getId());
 
         order.updateOrder(OrderState.USER_CANCELED);
     }
