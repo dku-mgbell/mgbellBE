@@ -233,6 +233,10 @@ public class ReviewService {
 
         int maxReviewScore = Collections.max(reviewScoreCnts);
 
+        if(maxReviewScore == 0){
+            return ReviewScore.NONE;
+        }
+
         return
                 switch (reviewScoreCnts.indexOf(maxReviewScore)) {
                     case 1 -> ReviewScore.GOOD;
