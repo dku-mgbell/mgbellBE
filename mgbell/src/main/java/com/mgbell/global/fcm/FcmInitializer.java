@@ -13,27 +13,27 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class FcmInitializer {
-    @Value("${fcm.certification}")
-    private String FIREBASE_CONFIG_PATH;
-
-    @PostConstruct
-    public void initFcm() {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(FIREBASE_CONFIG_PATH);
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(fileInputStream))
-                    .build();
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-                log.info("FirebaseApp initialization complete");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-}
+//@Component
+//@RequiredArgsConstructor
+//@Slf4j
+//public class FcmInitializer {
+//    @Value("${fcm.certification}")
+//    private String FIREBASE_CONFIG_PATH;
+//
+//    @PostConstruct
+//    public void initFcm() {
+//        try {
+//            FileInputStream fileInputStream = new FileInputStream(FIREBASE_CONFIG_PATH);
+//            FirebaseOptions options = FirebaseOptions.builder()
+//                    .setCredentials(GoogleCredentials.fromStream(fileInputStream))
+//                    .build();
+//            if (FirebaseApp.getApps().isEmpty()) {
+//                FirebaseApp.initializeApp(options);
+//                log.info("FirebaseApp initialization complete");
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//}
