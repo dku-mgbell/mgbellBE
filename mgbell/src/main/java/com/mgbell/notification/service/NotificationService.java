@@ -132,6 +132,8 @@ public class NotificationService {
                 "마감벨 주문 알림",
                 "주문이 들어왔어요!"
         );
+
+        sendNotification(request);
     }
 
     @Transactional
@@ -144,6 +146,8 @@ public class NotificationService {
                 "마감벨 주문 취소 알림",
                 "주문이 취소됐어요"
         );
+
+        sendNotification(request);
     }
 
     public void send(Message message) {
