@@ -59,3 +59,6 @@ oauth:
 
 s3:
   url: ${s3.link}
+
+fcm:
+  certification: ${firebase.sdk}
