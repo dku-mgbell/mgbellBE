@@ -9,15 +9,16 @@ import com.mgbell.review.exception.EditNotAvailableException;
 import com.mgbell.review.exception.ReviewNotAvailableException;
 import com.mgbell.review.exception.ReviewNotFoundException;
 import com.mgbell.review.model.dto.request.OwnerCommentRequest;
+import com.mgbell.review.model.dto.request.ReviewFilterRequest;
 import com.mgbell.review.model.dto.request.UserReviewEditRequest;
 import com.mgbell.review.model.dto.request.UserReviewRequest;
 import com.mgbell.review.model.dto.response.*;
 import com.mgbell.review.model.entity.Review;
 import com.mgbell.review.model.entity.ReviewImage;
 import com.mgbell.review.model.entity.ReviewScore;
-import com.mgbell.review.model.entity.SatisfiedReason;
 import com.mgbell.review.repository.ReviewImageRepositoty;
 import com.mgbell.review.repository.ReviewRepository;
+import com.mgbell.review.repository.ReviewRepositoryCustom;
 import com.mgbell.store.exception.StoreNotFoundException;
 import com.mgbell.store.model.entity.Store;
 import com.mgbell.store.repository.StoreRepository;
@@ -45,6 +46,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final ReviewRepositoryCustom reviewRepositoryCustom;
     private final UserRepository userRepository;
     private final ReviewImageRepositoty reviewImageRepositoty;
     private final StoreRepository storeRepository;
@@ -246,13 +248,13 @@ public class ReviewService {
                 };
     }
 
-    public Page<ReviewResponse> getReviewList(Pageable pageable, Long storeId, Long userId) {
+    public Page<ReviewResponse> getReviewList(ReviewFilterRequest request, Pageable pageable, Long storeId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(StoreNotFoundException::new);
 
-        Page<Review> reviews = reviewRepository.findByStoreId(pageable, store.getId());
+        Page<Review> reviews = reviewRepositoryCustom.findByWhere(pageable, request, storeId);
 
         return getReviewPage(reviews);
     }

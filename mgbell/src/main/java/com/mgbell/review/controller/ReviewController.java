@@ -4,6 +4,7 @@ import com.mgbell.global.auth.jwt.JwtAuthentication;
 import com.mgbell.global.config.swagger.OwnerAuth;
 import com.mgbell.global.config.swagger.UserAuth;
 import com.mgbell.review.model.dto.request.OwnerCommentRequest;
+import com.mgbell.review.model.dto.request.ReviewFilterRequest;
 import com.mgbell.review.model.dto.request.UserReviewEditRequest;
 import com.mgbell.review.model.dto.request.UserReviewRequest;
 import com.mgbell.review.model.dto.response.OwnerReviewResponse;
@@ -85,8 +86,10 @@ public class ReviewController {
     @UserAuth
     @GetMapping("/list/{storeId}")
     @Operation(summary = "일반 사용자 API: 가게 리뷰 보기")
-    public ResponseEntity<Page<ReviewResponse>> getReviewList(@PathVariable Long storeId, Pageable pageable,
+    public ResponseEntity<Page<ReviewResponse>> getReviewList(@PathVariable Long storeId,
+                                                              ReviewFilterRequest request,
+                                                              Pageable pageable,
                                                               JwtAuthentication auth) {
-        return ResponseEntity.ok(reviewService.getReviewList(pageable, storeId, auth.getUserId()));
+        return ResponseEntity.ok(reviewService.getReviewList(request, pageable, storeId, auth.getUserId()));
     }
 }
