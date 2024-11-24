@@ -111,7 +111,7 @@ public class OrderService {
         post.setAmount(leftAmount);
         post.setOnSale(true);
 
-        notificationService.sendOrderRequest(order.getStore().getUser().getId());
+        notificationService.sendOrderCancel(order.getStore().getUser().getId());
 
         order.updateOrder(OrderState.USER_CANCELED);
     }
