@@ -1,7 +1,7 @@
 package com.mgbell.notification.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
-import com.mgbell.global.config.swagger.UserAuth;
+import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.notification.model.dto.request.NotificationRequest;
 import com.mgbell.notification.model.dto.request.TokenRegisterRequest;
 import com.mgbell.notification.service.NotificationService;
@@ -22,14 +22,14 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final UserRepository userRepository;
 
-    @UserAuth
+    @AllUserAuth
     @PostMapping("/register")
     @Operation(summary = "FCM 토큰 등록하기", description = "리액트에서 발급받은 토큰 입력")
     public void register(@RequestBody TokenRegisterRequest request, JwtAuthentication auth) {
         notificationService.register(auth.getUserId(), request);
     }
 
-    @UserAuth
+    @AllUserAuth
     @PostMapping("/send")
     @Operation(summary = "백그라운드 알림 테스트")
     public void send(@RequestBody NotificationRequest request, JwtAuthentication auth) {

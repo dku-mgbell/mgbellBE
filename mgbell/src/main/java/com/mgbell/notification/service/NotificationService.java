@@ -122,6 +122,29 @@ public class NotificationService {
         );
     }
 
+    @Transactional
+    public void sendOrderRequest(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        NotificationRequest request = new NotificationRequest(
+                user.getEmail(),
+                "마감벨 주문 알림",
+                "주문이 들어왔어요!"
+        );
+    }
+
+    @Transactional
+    public void sendOrderCancel(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        NotificationRequest request = new NotificationRequest(
+                user.getEmail(),
+                "마감벨 주문 취소 알림",
+                "주문이 취소됐어요"
+        );
+    }
 
     public void send(Message message) {
         FirebaseMessaging.getInstance().sendAsync(message);
