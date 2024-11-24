@@ -20,6 +20,6 @@ public class FavoriteResponse {
     private int costPrice;
     private int salePrice;
     private int amount;
-    private int reviewCount;
+    private int reviewCnt;
     private String image;
 }

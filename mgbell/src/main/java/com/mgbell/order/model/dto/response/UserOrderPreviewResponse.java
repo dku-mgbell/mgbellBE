@@ -12,8 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserOrderPreviewResponse {
+    private Long id; // 판매글 id
     private Long orderId;
-    private Long postId;
     private Long storeId;
     private LocalDateTime orderDateTime;
     private String storeName;

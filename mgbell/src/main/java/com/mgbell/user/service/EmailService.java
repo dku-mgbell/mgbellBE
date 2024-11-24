@@ -2,14 +2,14 @@ package com.mgbell.user.service;
 
 import com.mgbell.global.nhn.service.NhnService;
 import com.mgbell.user.exception.IncorrectEmailCode;
+import com.mgbell.user.exception.OAuthUserHasNoPasswordException;
 import com.mgbell.user.exception.UserAlreadyExistException;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.dto.response.TokenValidationResponse;
+import com.mgbell.user.model.entity.user.User;
 import com.mgbell.user.repository.TokenRedisRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,8 +40,12 @@ public class EmailService {
     }
 
     public void sendVerificationCodeForPassword(String email) {
-        userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
+
+        if (user.getPassword() == null) {
+            throw new OAuthUserHasNoPasswordException();
+        }
 
         String code = createRandomAccessCode();
 

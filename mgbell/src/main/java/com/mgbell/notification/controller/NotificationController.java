@@ -26,7 +26,7 @@ public class NotificationController {
     @PostMapping("/register")
     @Operation(summary = "FCM 토큰 등록하기", description = "리액트에서 발급받은 토큰 입력")
     public void register(@RequestBody TokenRegisterRequest request, JwtAuthentication auth) {
-        notificationService.register(request);
+        notificationService.register(auth.getUserId(), request);
     }
 
     @UserAuth
