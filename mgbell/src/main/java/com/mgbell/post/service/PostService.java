@@ -8,7 +8,9 @@ import com.mgbell.post.model.entity.Post;
 import com.mgbell.post.repository.PostRepository;
 import com.mgbell.post.repository.PostRepositoryCustom;
 import com.mgbell.review.repository.ReviewRepository;
+import com.mgbell.store.exception.StoreIsNotActivatedException;
 import com.mgbell.store.exception.StoreNotFoundException;
+import com.mgbell.store.model.entity.Status;
 import com.mgbell.store.repository.StoreImageRepository;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.exception.UserHasNoAuthorityException;
@@ -109,6 +111,8 @@ public class PostService {
 
         Store store = storeRepository.findByUserId(id)
                 .orElseThrow(StoreNotFoundException::new);
+
+        if(store.getStatus().equals(Status.INACTIVE)) throw new StoreIsNotActivatedException();
 
         Post post = Post.builder()
                 .user(user)

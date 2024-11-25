@@ -28,6 +28,7 @@ import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Service
 @Slf4j
@@ -103,6 +105,9 @@ public class OrderService {
         if(!order.getUser().getId().equals(userId)) {
             throw new UserHasNoAuthorityException();
         }
+
+        ArrayList<Integer> as = new ArrayList<>();
+        as.iterator().next();
 
         Post post = order.getStore().getPost();
 
