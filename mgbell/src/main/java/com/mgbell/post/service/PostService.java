@@ -1,6 +1,8 @@
 package com.mgbell.post.service;
 
+import com.mgbell.favorite.model.entity.Favorite;
 import com.mgbell.favorite.repository.FavoriteRepository;
+import com.mgbell.notification.service.NotificationService;
 import com.mgbell.post.exception.PostNotFoundException;
 import com.mgbell.post.model.dto.request.*;
 import com.mgbell.post.model.dto.response.*;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,6 +48,7 @@ public class PostService {
     private final StoreRepository storeRepository;
     private final StoreImageRepository storeImageRepository;
     private final ReviewRepository reviewRepository;
+    private final NotificationService notificationService;
 
     @Value("${s3.url}")
     private String s3url;
@@ -73,7 +77,6 @@ public class PostService {
         Post post = postRepository.findByUserId(userId)
                 .orElseThrow(PostNotFoundException::new);
 
-//                store.getImages().stream()
         List<String> images = storeImageRepository.findByStoreId(store.getId())
                 .stream()
                 .map(currImage ->
@@ -89,7 +92,6 @@ public class PostService {
                 post.getBagName(),
                 post.getDescription(),
                 reviewRepository.findByStoreId(store.getId()).size(),
-//                store.getReviews().size(),
                 store.getAddress(),
                 store.getLongitude(),
                 store.getLatitude(),
@@ -164,6 +166,8 @@ public class PostService {
         Post post = postRepository.findByUserId(id)
                 .orElseThrow(PostNotFoundException::new);
 
+        sendStoreOpenAlert(post.getStore());
+
         post.setOnSale(request.isOnSale());
     }
 
@@ -208,7 +212,6 @@ public class PostService {
                     currPost.getBagName(),
                     favorite,
                     reviewRepository.findByStoreId(store.getId()).size(),
-//                    store.getReviews().size(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -233,15 +236,12 @@ public class PostService {
                                             currImage.getOriginalFileDir(),
                                             StandardCharsets.UTF_8)
                     ).toList();
-//            List<String> images = store.getImages().stream()
-//                    .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
             return new PostPreviewForGuestResponse(
                     currPost.getPostId(),
                     store.getStoreName(),
                     currPost.getBagName(),
                     reviewRepository.findByStoreId(store.getId()).size(),
-//                    store.getReviews().size(),
                     currPost.isOnSale(),
                     currPost.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
                     currPost.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -270,8 +270,6 @@ public class PostService {
                                         currImage.getOriginalFileDir(),
                                         StandardCharsets.UTF_8)
                 ).toList();
-//        List<String> images = store.getImages().stream()
-//                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostResponse.builder()
                 .id(postId)
@@ -307,8 +305,6 @@ public class PostService {
                                         currImage.getOriginalFileDir(),
                                         StandardCharsets.UTF_8)
                 ).toList();
-//        List<String> images = store.getImages().stream()
-//                .map(currImage -> s3url + URLEncoder.encode(currImage.getOriginalFileDir(), StandardCharsets.UTF_8)).toList();
 
         return PostForGuestResponse.builder()
                 .id(postId)
@@ -334,5 +330,16 @@ public class PostService {
         if(user.getUserRole() != UserRole.OWNER) throw new UserHasNoAuthorityException();
         if(storeRepository.findByUserId(user.getId()).isEmpty()) throw new UserHasNoStoreException();
         if(postRepository.findByUserId(user.getId()).isEmpty()) throw new UserHasNoPostException();
+    }
+
+    private void sendStoreOpenAlert(Store store) {
+        List<Favorite> favorites = favoriteRepository.findByStoreId(store.getId());
+        List<String> userEmails = new ArrayList<>();
+
+        favorites.forEach(currFavorite -> {
+            userEmails.add(currFavorite.getUser().getEmail());
+        });
+
+        notificationService.sendOpenNotification(userEmails, store.getStoreName());
     }
 }
