@@ -166,9 +166,9 @@ public class PostService {
         Post post = postRepository.findByUserId(id)
                 .orElseThrow(PostNotFoundException::new);
 
-        sendStoreOpenAlert(post.getStore());
-
         post.setOnSale(request.isOnSale());
+
+        if(request.isOnSale()) sendStoreOpenAlert(post.getStore());
     }
 
     @Transactional
