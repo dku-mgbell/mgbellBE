@@ -2,6 +2,7 @@ package com.mgbell.notification.service;
 
 import com.google.firebase.messaging.*;
 import com.mgbell.notification.exception.FcmTokenNotRegisteredException;
+import com.mgbell.notification.model.dto.request.MultiNotificationRequest;
 import com.mgbell.notification.model.dto.request.NotificationRequest;
 import com.mgbell.notification.model.dto.request.TokenRegisterRequest;
 import com.mgbell.notification.model.entity.NotificationHistory;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -84,24 +87,76 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void sendSubmitNotification(String studentId) {
-        NotificationRequest notificationRequest = new NotificationRequest(
-                studentId,
-                "설문 제출 완료",
-                "설문이 성공적으로 제출되었습니다!"
-        );
+    @Transactional
+    public void sendNotificationToMultiple(MultiNotificationRequest request, List<String> registrationTokens) {
+        String title = request.getTitle();
+        String body = request.getBody();
 
-        sendNotification(notificationRequest);
+        MulticastMessage multicastMessage =  MulticastMessage.builder()
+                // 알림 보낼 유저 목록
+                .addAllTokens(registrationTokens)
+                .putData("title", title)
+                .putData("body", body)
+                // 안드로이드
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setNotification(AndroidNotification.builder()
+                                .setTitle(title)
+                                .setBody(body)
+                                .build())
+                        .build())
+                // 아이폰
+                .setApnsConfig(ApnsConfig.builder()
+                        .putHeader("apns-priority", "10")
+                        .setAps(Aps.builder()
+                                .setAlert(ApsAlert.builder()
+                                        .setTitle(title)
+                                        .setBody(body)
+                                        .build())
+                                .setBadge(42)
+                                .build())
+                        .build())
+                .build();
+
+
+        sendMultiMessage(multicastMessage);
+
+        NotificationHistory notification = NotificationHistory.builder()
+                .title(title)
+                .content(body)
+                .build();
+        notificationRepository.save(notification);
     }
 
-    public void sendFriendNotification(String studentId) {
-        NotificationRequest notificationRequest = new NotificationRequest(
-                studentId,
-                "친구 요청 도착",
-                "친구 요청이 도착했습니다!"
+    @Transactional
+    public void sendOpenNotification(List<String> userEmails, String storeName) {
+        List<String> userTokens = new ArrayList<>();
+        userEmails.forEach(currEmail ->{
+                        userTokens.add(getToken(currEmail));
+                }
         );
 
-        sendNotification(notificationRequest);
+        MultiNotificationRequest request = new MultiNotificationRequest(
+                "마감벨 알림 🔔",
+                storeName + "에서 판매를 시작했어요!"
+        );
+
+        sendNotificationToMultiple(request, userTokens);
+    }
+
+    @Transactional
+    public void sendChangeNotification(List<String> userEmails, String storeName) {
+        List<String> userTokens = new ArrayList<>();
+        userEmails.forEach(currEmail ->{
+                    userTokens.add(getToken(currEmail));
+                }
+        );
+
+        MultiNotificationRequest request = new MultiNotificationRequest(
+                "마감벨 알림 🔔",
+                storeName + "의 수량이 변경됐어요!"
+        );
+
+        sendNotificationToMultiple(request, userTokens);
     }
 
     @Transactional
@@ -152,15 +207,20 @@ public class NotificationService {
 
     public void send(Message message) {
         FirebaseMessaging.getInstance().sendAsync(message);
-        log.info("Send NotificationHistory Success");
+        log.info("Send Notification Success");
     }
 
-    private String getToken(String studentId) {
-        return fcmRedisRepository.getToken(studentId);
+    public void sendMultiMessage(MulticastMessage multicastMessage) {
+        FirebaseMessaging.getInstance().sendEachForMulticastAsync(multicastMessage);
+        log.info("Send Multi Notification Success");
     }
 
-    private boolean hasKey(String studentId) {
-        return fcmRedisRepository.hasKey(studentId);
+    private String getToken(String email) {
+        return fcmRedisRepository.getToken(email);
+    }
+
+    private boolean hasKey(String email) {
+        return fcmRedisRepository.hasKey(email);
     }
 
     public void register(Long userId, TokenRegisterRequest request){
@@ -170,8 +230,8 @@ public class NotificationService {
         fcmRedisRepository.saveToken(user.getEmail(), request.getToken());
     }
 
-    public void deleteToken(String studentId){
-        fcmRedisRepository.deleteToken(studentId);
+    public void deleteToken(String email){
+        fcmRedisRepository.deleteToken(email);
         log.info("Delete Token Success");
     }
 }

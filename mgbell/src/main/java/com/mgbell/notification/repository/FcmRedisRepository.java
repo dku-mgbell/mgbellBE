@@ -15,15 +15,15 @@ public class FcmRedisRepository {
                 .set(email, token);
     }
 
-    public String getToken(String studentId) {
-        return tokenRedisTemplate.opsForValue().get(studentId);
+    public String getToken(String email) {
+        return tokenRedisTemplate.opsForValue().get(email);
     }
 
-    public void deleteToken(String studentId) {
-        tokenRedisTemplate.delete(studentId);
+    public void deleteToken(String email) {
+        tokenRedisTemplate.delete(email);
     }
 
-    public boolean hasKey(String studentId) {
-        return tokenRedisTemplate.hasKey(studentId);
+    public boolean hasKey(String email) {
+        return Boolean.TRUE.equals(tokenRedisTemplate.hasKey(email));
     }
 }
