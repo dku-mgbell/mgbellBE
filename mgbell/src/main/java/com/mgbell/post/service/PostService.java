@@ -144,6 +144,8 @@ public class PostService {
         Post post = postRepository.findByUserId(id)
                 .orElseThrow(PostNotFoundException::new);
 
+        if(post.getAmount() != request.getAmount()) sendAmountUpdatedAlert(post.getStore());
+
         post.updatePost(
                 request.getBagName(),
                 request.getDescription(),
@@ -341,5 +343,16 @@ public class PostService {
         });
 
         notificationService.sendOpenNotification(userEmails, store.getStoreName());
+    }
+
+    private void sendAmountUpdatedAlert(Store store) {
+        List<Favorite> favorites = favoriteRepository.findByStoreId(store.getId());
+        List<String> userEmails = new ArrayList<>();
+
+        favorites.forEach(currFavorite -> {
+            userEmails.add(currFavorite.getUser().getEmail());
+        });
+
+        notificationService.sendChangeNotification(userEmails, store.getStoreName());
     }
 }

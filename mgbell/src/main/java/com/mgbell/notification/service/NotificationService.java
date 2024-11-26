@@ -4,6 +4,7 @@ import com.google.firebase.messaging.*;
 import com.mgbell.notification.exception.FcmTokenNotRegisteredException;
 import com.mgbell.notification.model.dto.request.MultiNotificationRequest;
 import com.mgbell.notification.model.dto.request.NotificationRequest;
+import com.mgbell.notification.model.dto.request.OfficialNotificationRequest;
 import com.mgbell.notification.model.dto.request.TokenRegisterRequest;
 import com.mgbell.notification.model.entity.NotificationHistory;
 import com.mgbell.notification.repository.FcmRedisRepository;
@@ -15,6 +16,7 @@ import com.mgbell.post.repository.PostRepository;
 import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.exception.UserNotFoundException;
 import com.mgbell.user.model.entity.user.User;
+import com.mgbell.user.model.entity.user.UserRole;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -125,6 +127,32 @@ public class NotificationService {
                 .content(body)
                 .build();
         notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void sendOfficialNotification(OfficialNotificationRequest request) {
+        List<String> userEmails = new ArrayList<>();
+
+        if (request.getTo().isOwner()) {
+            List<User> owners = userRepository.findByUserRole(request.getTo());
+
+            owners.forEach(currOwner -> {
+                userEmails.add(currOwner.getEmail());
+            });
+        }
+
+        List<String> userTokens = new ArrayList<>();
+        userEmails.forEach(currEmail ->{
+                    userTokens.add(getToken(currEmail));
+                }
+        );
+
+        MultiNotificationRequest notiRequest = new MultiNotificationRequest(
+                "마감벨 공지 📢",
+                request.getBody()
+        );
+
+        sendNotificationToMultiple(notiRequest, userTokens);
     }
 
     @Transactional
