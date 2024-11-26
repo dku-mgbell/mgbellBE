@@ -1,8 +1,10 @@
 package com.mgbell.notification.controller;
 
 import com.mgbell.global.auth.jwt.JwtAuthentication;
+import com.mgbell.global.config.swagger.AdminAuth;
 import com.mgbell.global.config.swagger.AllUserAuth;
 import com.mgbell.notification.model.dto.request.NotificationRequest;
+import com.mgbell.notification.model.dto.request.OfficialNotificationRequest;
 import com.mgbell.notification.model.dto.request.TokenRegisterRequest;
 import com.mgbell.notification.service.NotificationService;
 import com.mgbell.user.exception.UserNotFoundException;
@@ -33,9 +35,19 @@ public class NotificationController {
     @PostMapping("/send")
     @Operation(summary = "백그라운드 알림 테스트")
     public void send(@RequestBody NotificationRequest request, JwtAuthentication auth) {
-        User user = userRepository.findById(auth.getUserId())
+        userRepository.findById(auth.getUserId())
                 .orElseThrow(UserNotFoundException::new);
 
         notificationService.sendNotification(request);
+    }
+
+    @AdminAuth
+    @PostMapping("/nofify")
+    @Operation(summary = "사용자에게 공지 보내기")
+    public void send(@RequestBody OfficialNotificationRequest request, JwtAuthentication auth) {
+        userRepository.findById(auth.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+
+        notificationService.sendOfficialNotification(request);
     }
 }
