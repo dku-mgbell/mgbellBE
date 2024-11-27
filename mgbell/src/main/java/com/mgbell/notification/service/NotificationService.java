@@ -155,7 +155,9 @@ public class NotificationService {
 
         List<String> userTokens = new ArrayList<>();
         userEmails.forEach(currEmail -> {
-                    userTokens.add(getToken(currEmail));
+                    if(getToken(currEmail) != null) {
+                        userTokens.add(getToken(currEmail));
+                    }
                 }
         );
 
