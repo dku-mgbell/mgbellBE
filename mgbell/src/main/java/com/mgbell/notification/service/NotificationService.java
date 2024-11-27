@@ -133,23 +133,31 @@ public class NotificationService {
     public void sendOfficialNotification(OfficialNotificationRequest request) {
         List<String> userEmails = new ArrayList<>();
 
-        if (request.getTo().isOwner()) {
-            List<User> owners = userRepository.findByUserRole(request.getTo());
+//        if (request.getTo() == UserRole.OWNER) {
+//            List<User> owners = userRepository.findByUserRole(request.getTo());
+//
+//            owners.forEach(currOwner -> {
+//                userEmails.add(currOwner.getEmail());
+//            });
+//        } else if (request.getTo() == UserRole.USER){
+//            List<User> users = userRepository.findByUserRole(request.getTo());
+//
+//            users.forEach(currOwner -> {
+//                userEmails.add(currOwner.getEmail());
+//            });
+//        }
 
-            owners.forEach(currOwner -> {
-                userEmails.add(currOwner.getEmail());
-            });
-        } else {
-            List<User> users = userRepository.findByUserRole(request.getTo());
+        List<User> users = userRepository.findByUserRole(request.getTo());
 
-            users.forEach(currOwner -> {
-                userEmails.add(currOwner.getEmail());
-            });
-        }
+        users.forEach(currUser -> {
+            userEmails.add(currUser.getEmail());
+        });
 
         List<String> userTokens = new ArrayList<>();
-        userEmails.forEach(currEmail ->{
-                    userTokens.add(getToken(currEmail));
+        userEmails.forEach(currEmail -> {
+                    if(getToken(currEmail) != null) {
+                        userTokens.add(getToken(currEmail));
+                    }
                 }
         );
 
