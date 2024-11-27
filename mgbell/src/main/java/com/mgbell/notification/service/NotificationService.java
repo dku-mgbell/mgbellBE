@@ -139,6 +139,12 @@ public class NotificationService {
             owners.forEach(currOwner -> {
                 userEmails.add(currOwner.getEmail());
             });
+        } else {
+            List<User> users = userRepository.findByUserRole(request.getTo());
+
+            users.forEach(currOwner -> {
+                userEmails.add(currOwner.getEmail());
+            });
         }
 
         List<String> userTokens = new ArrayList<>();
