@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -71,32 +72,64 @@ public class FavoriteService {
     }
 
     private Page<FavoriteResponse> getFavoriteResponses(Page<Favorite> favorites) {
-        return favorites.map(currFavorite -> {
-            Store store = currFavorite.getStore();
-            Post post = store.getPost();
+        return new PageImpl<>(favorites.stream()
+                .filter(currFavorite -> currFavorite.getStore().getPost() != null)
+                .map(currFavorite -> {
+                    Store store = currFavorite.getStore();
+                    Post post = store.getPost();
 
-            return new FavoriteResponse(
-                    store.getPost().getPostId(),
-                    store.getStoreName(),
-                    post.getBagName(),
-                    post.isOnSale(),
-                    post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    store.getAddress(),
-                    store.getLongitude(),
-                    store.getLatitude(),
-                    post.getCostPrice(),
-                    post.getSalePrice(),
-                    post.getAmount(),
-                    reviewRepository.findByStoreId(store.getId()).size(),
-                    s3url +
-                            URLEncoder.encode(
-                                    storeImageRepository.findByStoreId(store.getId())
-                                            .get(0)
-                                            .getOriginalFileDir(),
-                                    StandardCharsets.UTF_8
-                            )
-            );
-        });
+                    return new FavoriteResponse(
+                            store.getPost().getPostId(),
+                            store.getStoreName(),
+                            post.getBagName(),
+                            post.isOnSale(),
+                            post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                            post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                            store.getAddress(),
+                            store.getLongitude(),
+                            store.getLatitude(),
+                            post.getCostPrice(),
+                            post.getSalePrice(),
+                            post.getAmount(),
+                            reviewRepository.findByStoreId(store.getId()).size(),
+                            s3url +
+                                    URLEncoder.encode(
+                                            storeImageRepository.findByStoreId(store.getId())
+                                                    .get(0)
+                                                    .getOriginalFileDir(),
+                                            StandardCharsets.UTF_8
+                                    )
+                    );
+                }).toList());
+//        return favorites
+////                .stream()
+////                .filter(currFavorite -> currFavorite.getStore().getPost() != null)
+//                .map(currFavorite -> {
+//            Store store = currFavorite.getStore();
+//            Post post = store.getPost();
+//
+//            return new FavoriteResponse(
+//                    store.getPost().getPostId(),
+//                    store.getStoreName(),
+//                    post.getBagName(),
+//                    post.isOnSale(),
+//                    post.getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+//                    post.getEndAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+//                    store.getAddress(),
+//                    store.getLongitude(),
+//                    store.getLatitude(),
+//                    post.getCostPrice(),
+//                    post.getSalePrice(),
+//                    post.getAmount(),
+//                    reviewRepository.findByStoreId(store.getId()).size(),
+//                    s3url +
+//                            URLEncoder.encode(
+//                                    storeImageRepository.findByStoreId(store.getId())
+//                                            .get(0)
+//                                            .getOriginalFileDir(),
+//                                    StandardCharsets.UTF_8
+//                            )
+//            );
+//        });
     }
 }
