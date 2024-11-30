@@ -94,6 +94,8 @@ public class NotificationService {
         String title = request.getTitle();
         String body = request.getBody();
 
+        if (registrationTokens.isEmpty()) return;
+
         MulticastMessage multicastMessage =  MulticastMessage.builder()
                 // 알림 보낼 유저 목록
                 .addAllTokens(registrationTokens)
@@ -179,6 +181,8 @@ public class NotificationService {
                             userTokens.add(getToken(currEmail));
                         }
                 );
+
+        if (userTokens.isEmpty()) return;
 
         MultiNotificationRequest request = new MultiNotificationRequest(
                 "마감벨 알림 🔔",
