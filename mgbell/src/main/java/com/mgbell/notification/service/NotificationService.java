@@ -48,9 +48,9 @@ public class NotificationService {
 
     @Transactional
     public void sendNotification(NotificationRequest notificationRequest) {
-        if (!hasKey(notificationRequest.getEmail())) {
+        if (getToken(notificationRequest.getEmail()) != null && getToken(notificationRequest.getEmail()).isEmpty()) {
             log.info("토큰이 등록되어 있지 않음");
-            throw new FcmTokenNotRegisteredException();
+            return;
         }
         String token = getToken(notificationRequest.getEmail());
         String title = notificationRequest.getTitle();
@@ -172,10 +172,13 @@ public class NotificationService {
     @Transactional
     public void sendOpenNotification(List<String> userEmails, String storeName) {
         List<String> userTokens = new ArrayList<>();
-        userEmails.forEach(currEmail ->{
-                        userTokens.add(getToken(currEmail));
-                }
-        );
+        userEmails
+                .stream()
+                .filter(email -> getToken(email) != null && !getToken(email).isEmpty())
+                .forEach(currEmail ->{
+                            userTokens.add(getToken(currEmail));
+                        }
+                );
 
         MultiNotificationRequest request = new MultiNotificationRequest(
                 "마감벨 알림 🔔",
@@ -188,10 +191,13 @@ public class NotificationService {
     @Transactional
     public void sendChangeNotification(List<String> userEmails, String storeName) {
         List<String> userTokens = new ArrayList<>();
-        userEmails.forEach(currEmail ->{
-                    userTokens.add(getToken(currEmail));
-                }
-        );
+        userEmails
+                .stream()
+                .filter(email -> getToken(email) != null && !getToken(email).isEmpty())
+                .forEach(currEmail ->{
+                            userTokens.add(getToken(currEmail));
+                        }
+                );
 
         MultiNotificationRequest request = new MultiNotificationRequest(
                 "마감벨 알림 🔔",
