@@ -37,6 +37,13 @@ public class UserController {
         userService.edit(request, auth.getUserId());
     }
 
+    @UserAuth
+    @PatchMapping(path = "/nick-name")
+    @Operation(summary = "닉네임 수정")
+    public void nickName(@RequestBody NickNameRequest request, JwtAuthentication auth) {
+        userService.setNickName(request, auth.getUserId());
+    }
+
     @AllUserAuth
     @DeleteMapping(path = "/delete")
     @Operation(summary = "회원 탈퇴")

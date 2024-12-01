@@ -48,7 +48,6 @@ public class UserService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
-    private final PostRepository postRepository;
     private final S3Service s3Service;
     private final StoreImageRepository storeImageRepository;
     private final FavoriteRepository favoriteRepository;
@@ -114,6 +113,7 @@ public class UserService {
                 ).toList();
 
         return new MyPageResponse(
+                user.getNickName(),
                 user.getName(),
                 user.getOrderCnt(),
                 user.getCarbonReduction(),
@@ -156,8 +156,19 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
-        user.setName(request.getName());
-        user.setPhoneNumber(request.getPhoneNumber());
+        user.editUserInfo(
+                request.getNickName(),
+                request.getName(),
+                request.getPhoneNumber()
+        );
+    }
+
+    @Transactional
+    public void setNickName(NickNameRequest request, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setNickName(request.getNickName());
     }
 
     @Transactional
@@ -225,7 +236,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
-
     public UserInfoResponse whoAmI(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
@@ -236,6 +246,7 @@ public class UserService {
                 user.getEmail()
         );
     }
+
     @Transactional
     public void deleteReviewImages(Review review) {
         List<ReviewImage> images = review.getImages();

@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyPageResponse {
+    private String nickName;
     private String name;
     private int orderCount;
     private float carbonReduction;

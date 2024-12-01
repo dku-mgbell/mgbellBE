@@ -28,6 +28,8 @@ public class User {
     @NotNull
     @Setter
     private String name;
+    @Setter
+    private String nickName;
     @NotNull
     @Setter
     private String phoneNumber;
@@ -38,18 +40,12 @@ public class User {
     private int orderCnt;
     private float carbonReduction;
     private int totalDiscount;
-//
-//    @Setter
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private Store store;
-//
-//    @Setter
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    private List<Order> order = new ArrayList<>();
-//
-//    @Setter
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    private List<Review> review = new ArrayList<>();
+
+    public void editUserInfo(String nickName, String name, String phoneNumber) {
+        this.nickName = nickName;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+    }
 
     public void userOrderUpdate(int orderCnt, float carbonReduction, int totalDiscount) {
         this.orderCnt += orderCnt;
