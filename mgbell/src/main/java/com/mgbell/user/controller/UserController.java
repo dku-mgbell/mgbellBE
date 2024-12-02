@@ -40,7 +40,7 @@ public class UserController {
     @UserAuth
     @PatchMapping(path = "/nickname")
     @Operation(summary = "닉네임 수정")
-    public void nickName(@RequestBody NicknameRequest request, JwtAuthentication auth) {
+    public void nickname(@RequestBody NicknameRequest request, JwtAuthentication auth) {
         userService.setNickname(request, auth.getUserId());
     }
 
