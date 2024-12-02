@@ -69,6 +69,7 @@ public class UserService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(request.getNickname())
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .userRole(request.getUserRole())
@@ -113,7 +114,7 @@ public class UserService {
                 ).toList();
 
         return new MyPageResponse(
-                user.getNickName(),
+                user.getNickname(),
                 user.getName(),
                 user.getOrderCnt(),
                 user.getCarbonReduction(),
@@ -141,8 +142,11 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         user.setUserRole(request.getUserRole());
-        user.setName(request.getName());
-        user.setPhoneNumber(request.getPhoneNumber());
+        user.editUserInfo(
+                request.getNickname(),
+                request.getName(),
+                request.getPhoneNumber()
+        );
     }
 
     public String oAuthLogin(Long id) {
@@ -157,7 +161,7 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         user.editUserInfo(
-                request.getNickName(),
+                request.getNickname(),
                 request.getName(),
                 request.getPhoneNumber()
         );
@@ -168,7 +172,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
-        user.setNickName(request.getNickName());
+        user.setNickname(request.getNickName());
     }
 
     @Transactional
