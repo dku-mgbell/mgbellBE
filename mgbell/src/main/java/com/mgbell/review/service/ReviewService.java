@@ -166,7 +166,7 @@ public class ReviewService {
 
             return new OwnerReviewResponse(
                     currReview.getId(),
-                    currReview.getUser().getNickName(),
+                    currReview.getUser().getNickname(),
                     currReview.getContent(),
                     currReview.getOwnerComent(),
                     currReview.getOwnerCommentDate(),
@@ -279,7 +279,7 @@ public class ReviewService {
             }
 
             return new ReviewResponse(
-                    currReview.getUser().getNickName(),
+                    currReview.getUser().getNickname(),
                     currReview.getCreatedAt(),
                     currReview.getReviewScore(),
                     currReview.getContent(),

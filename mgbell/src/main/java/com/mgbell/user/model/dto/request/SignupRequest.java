@@ -36,6 +36,9 @@ public class SignupRequest {
             message = "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다.")
     private String password;
 
+    @NotBlank(message = "닉네임을 설정해주세요")
+    private String nickname;
+
     @NotBlank(message = "이름은 필수 입력값입니다")
     @Pattern(regexp = "^[가-힣]*$", message = "이름을 정확히 입력해주세요")
     private String name;

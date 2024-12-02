@@ -16,6 +16,9 @@ public class OAuthSignupRequest {
     @Enum(enumClass = UserRole.class, message = "가입 유형은 필수 입력값입니다.(USER, OWNER)")
     private UserRole userRole;
 
+    @NotBlank(message = "닉네임을 설정해주세요")
+    private String nickname;
+
     @NotBlank(message = "이름은 필수 입력값입니다")
     @Pattern(regexp = "^[가-힣]*$", message = "이름을 정확히 입력해주세요")
     private String name;

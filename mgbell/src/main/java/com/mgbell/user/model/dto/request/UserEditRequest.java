@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEditRequest {
-    private String nickName;
+    private String nickname;
     private String name;
     private String phoneNumber;
 }

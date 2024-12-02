@@ -29,7 +29,7 @@ public class User {
     @Setter
     private String name;
     @Setter
-    private String nickName;
+    private String nickname;
     @NotNull
     @Setter
     private String phoneNumber;
@@ -41,8 +41,8 @@ public class User {
     private float carbonReduction;
     private int totalDiscount;
 
-    public void editUserInfo(String nickName, String name, String phoneNumber) {
-        this.nickName = nickName;
+    public void editUserInfo(String nickname, String name, String phoneNumber) {
+        this.nickname = nickname;
         this.name = name;
         this.phoneNumber = phoneNumber;
     }

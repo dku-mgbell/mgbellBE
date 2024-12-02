@@ -8,8 +8,6 @@ import com.mgbell.global.s3.service.S3Service;
 import com.mgbell.order.model.entity.Order;
 import com.mgbell.order.model.entity.OrderState;
 import com.mgbell.order.repository.OrderRepository;
-import com.mgbell.post.model.entity.Post;
-import com.mgbell.post.repository.PostRepository;
 import com.mgbell.review.model.entity.Review;
 import com.mgbell.review.model.entity.ReviewImage;
 import com.mgbell.review.repository.ReviewImageRepositoty;
@@ -26,7 +24,6 @@ import com.mgbell.store.repository.StoreRepository;
 import com.mgbell.user.repository.TokenRedisRepository;
 import com.mgbell.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +32,6 @@ import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -69,6 +65,7 @@ public class UserService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(request.getNickname())
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .userRole(request.getUserRole())
@@ -113,7 +110,7 @@ public class UserService {
                 ).toList();
 
         return new MyPageResponse(
-                user.getNickName(),
+                user.getNickname(),
                 user.getName(),
                 user.getOrderCnt(),
                 user.getCarbonReduction(),
@@ -141,8 +138,11 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         user.setUserRole(request.getUserRole());
-        user.setName(request.getName());
-        user.setPhoneNumber(request.getPhoneNumber());
+        user.editUserInfo(
+                request.getNickname(),
+                request.getName(),
+                request.getPhoneNumber()
+        );
     }
 
     public String oAuthLogin(Long id) {
@@ -157,18 +157,18 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         user.editUserInfo(
-                request.getNickName(),
+                request.getNickname(),
                 request.getName(),
                 request.getPhoneNumber()
         );
     }
 
     @Transactional
-    public void setNickName(NickNameRequest request, Long id) {
+    public void setNickname(NicknameRequest request, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
-        user.setNickName(request.getNickName());
+        user.setNickname(request.getNickname());
     }
 
     @Transactional
